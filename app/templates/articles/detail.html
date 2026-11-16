@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} - LittleCare Health Library{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3 small">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('articles.index') }}" class="text-decoration-none">Health Library</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ article.category }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5">
+        <!-- Main Article Content -->
+        <div class="col-lg-8">
+            <div class="lc-card p-4 p-md-5 mb-4">
+                <span class="badge badge-blue px-3 py-2 rounded-pill mb-3">{{ article.category }}</span>
+                <h1 class="fw-bold text-dark mb-3">{{ article.title }}</h1>
+                <div class="d-flex flex-wrap align-items-center gap-3 text-muted small mb-4 pb-3 border-bottom">
+                    <span><i class="bi bi-person-fill text-primary me-1"></i> {{ article.author_name }}</span>
+                    <span><i class="bi bi-calendar3 me-1 text-danger"></i> {{ article.published_at.strftime('%B %d, %Y') }}</span>
+                    <span><i class="bi bi-clock me-1 text-info"></i> {{ article.reading_time_minutes }} min read</span>
+                </div>
+
+                <div class="lead text-muted mb-4 fs-6 fst-italic">
+                    {{ article.short_description }}
+                </div>
+
+                <!-- Rich Article Content -->
+                <div class="article-body text-dark leading-relaxed" style="line-height: 1.8; font-size: 1.05rem;">
+                    {{ article.content|safe }}
+                </div>
+
+                <!-- Medical References -->
+                {% if article.medical_references %}
+                    <div class="p-4 rounded-4 bg-light border mt-5 small">
+                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-bookmark-check text-primary me-1"></i> Scientific & Clinical References:</h6>
+                        <p class="mb-0 text-muted">{{ article.medical_references }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Sidebar: Ask AI & Related Articles -->
+        <div class="col-lg-4">
+            <!-- Ask AI Widget -->
+            <div class="lc-card p-4 mb-4" style="background: linear-gradient(135deg, #f0f9ff 0%, #fce7f3 100%);">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="rounded-circle bg-white p-2 text-primary shadow-sm"><i class="bi bi-robot"></i></span>
+                    <h6 class="fw-bold text-dark mb-0">Have Questions on This Topic?</h6>
+                </div>
+                <p class="text-muted small mb-3">Ask LittleCare AI for instant educational clarification tailored to your baby.</p>
+                <a href="{{ url_for('ai.index') }}" class="btn btn-sm btn-lc-pink btn-rounded w-100 shadow-sm">
+                    Ask AI Assistant
+                </a>
+            </div>
+
+            <!-- Related Articles -->
+            {% if related_articles %}
+                <div class="lc-card p-4">
+                    <h6 class="fw-bold text-dark mb-3">Related Guides</h6>
+                    <div class="list-group list-group-flush small">
+                        {% for rel in related_articles %}
+                            <a href="{{ url_for('articles.detail', slug=rel.slug) }}" class="list-group-item list-group-item-action px-0 py-2 border-0">
+                                <strong class="d-block text-dark mb-1">{{ rel.title }}</strong>
+                                <small class="text-muted">{{ rel.short_description[:70] }}...</small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

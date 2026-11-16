@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Support - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-5 justify-content-center">
+        <div class="col-lg-5">
+            <span class="badge badge-pink px-3 py-2 rounded-pill mb-3">Get In Touch</span>
+            <h1 class="fw-bold text-dark mb-3">We're Here to Support Your Family</h1>
+            <p class="text-muted leading-relaxed mb-4">
+                Have questions about your LittleCare account, doctor appointments, or technical support? Reach out to our dedicated clinical support team.
+            </p>
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex align-items-center gap-3 p-3 rounded-4 bg-white border">
+                    <span class="rounded-circle bg-info-subtle p-3 text-primary fs-5"><i class="bi bi-envelope-fill"></i></span>
+                    <div>
+                        <small class="text-muted d-block">Email Support</small>
+                        <strong class="text-dark">support@littlecare.health</strong>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-3 p-3 rounded-4 bg-white border">
+                    <span class="rounded-circle bg-success-subtle p-3 text-success fs-5"><i class="bi bi-telephone-fill"></i></span>
+                    <div>
+                        <small class="text-muted d-block">Helpline (Mon - Fri, 8AM - 5PM)</small>
+                        <strong class="text-dark">+63 (2) 8876-CARE</strong>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-3 p-3 rounded-4 bg-white border">
+                    <span class="rounded-circle bg-danger-subtle p-3 text-danger fs-5"><i class="bi bi-geo-alt-fill"></i></span>
+                    <div>
+                        <small class="text-muted d-block">Headquarters</small>
+                        <strong class="text-dark">Medical Plaza, Ortigas Center, Pasig City, Metro Manila</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="lc-card p-4 p-md-5">
+                <h4 class="fw-bold mb-4">Send Us a Message</h4>
+                <form method="POST" action="{{ url_for('main.contact') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Your Full Name</label>
+                        <input type="text" name="name" class="form-control rounded-pill px-3 py-2" placeholder="e.g. Maria Santos" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Email Address</label>
+                        <input type="email" name="email" class="form-control rounded-pill px-3 py-2" placeholder="e.g. maria@example.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Subject</label>
+                        <input type="text" name="subject" class="form-control rounded-pill px-3 py-2" placeholder="How can we assist you?" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small">Your Message</label>
+                        <textarea name="message" rows="4" class="form-control rounded-4 px-3 py-2" placeholder="Please describe your question or issue in detail..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-lc-primary btn-rounded w-100 py-2">
+                        <i class="bi bi-send-fill me-1"></i> Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

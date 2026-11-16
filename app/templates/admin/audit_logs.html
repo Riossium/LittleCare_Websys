@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Security & Access Audit Logs - LittleCare Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Security & Access Audit Trail</h2>
+            <p class="text-muted mb-0">Compliance monitoring in accordance with the Philippine Data Privacy Act of 2012</p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-rounded">
+            <i class="bi bi-arrow-left me-1"></i> Dashboard
+        </a>
+    </div>
+
+    <div class="lc-card p-4">
+        {% if logs %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 font-monospace" style="font-size: 0.85rem;">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Timestamp (UTC)</th>
+                            <th>User ID</th>
+                            <th>Action Type</th>
+                            <th>Details</th>
+                            <th>IP Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for l in logs %}
+                            <tr>
+                                <td class="text-muted">{{ l.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td>
+                                    {% if l.user_id %}
+                                        <span class="badge bg-light text-dark border">User #{{ l.user_id }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary-subtle text-secondary">System/Guest</span>
+                                    {% endif %}
+                                </td>
+                                <td><span class="badge bg-primary-subtle text-primary">{{ l.action }}</span></td>
+                                <td class="text-truncate" style="max-width: 450px;">{{ l.details or '-' }}</td>
+                                <td class="text-muted">{{ l.ip_address or 'Localhost' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5 text-muted small">No audit logs recorded yet.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

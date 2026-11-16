@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Verification & Credentials - LittleCare Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Doctor Credential Verifications</h2>
+            <p class="text-muted mb-0">Verify physician PRC Medical License credentials before granting public consultation access</p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-rounded">
+            <i class="bi bi-arrow-left me-1"></i> Admin Panel
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="d-flex gap-2 mb-4">
+        <a href="{{ url_for('admin.doctors', status='all') }}" class="btn btn-sm rounded-pill px-3 {% if current_status == 'all' %}btn-primary{% else %}btn-light border{% endif %}">
+            All Doctors
+        </a>
+        <a href="{{ url_for('admin.doctors', status='pending') }}" class="btn btn-sm rounded-pill px-3 {% if current_status == 'pending' %}btn-warning text-dark{% else %}btn-light border{% endif %}">
+            Pending Approval
+        </a>
+        <a href="{{ url_for('admin.doctors', status='verified') }}" class="btn btn-sm rounded-pill px-3 {% if current_status == 'verified' %}btn-success{% else %}btn-light border{% endif %}">
+            Verified Doctors
+        </a>
+    </div>
+
+    <div class="lc-card p-4">
+        {% if doctors %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small text-muted">
+                        <tr>
+                            <th>Physician</th>
+                            <th>Specialty</th>
+                            <th>PRC License</th>
+                            <th>PTR No.</th>
+                            <th>Hospital / Clinic</th>
+                            <th>Status</th>
+                            <th class="text-end">Verification Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in doctors %}
+                            <tr>
+                                <td>
+                                    <strong class="text-dark d-block">{{ d.doctor_name }}</strong>
+                                    <small class="text-muted">{{ d.user.email }} &bull; {{ d.user.phone or 'No phone' }}</small>
+                                </td>
+                                <td><span class="badge badge-mint">{{ d.specialty }}</span></td>
+                                <td class="font-monospace fw-bold text-primary">{{ d.license_number }}</td>
+                                <td class="small text-muted">{{ d.ptr_number or '-' }}</td>
+                                <td class="small text-muted">{{ d.clinic_affiliation }}</td>
+                                <td>
+                                    {% if d.is_verified %}
+                                        <span class="badge bg-success-subtle text-success"><i class="bi bi-patch-check-fill me-1"></i> Verified</span>
+                                    {% else %}
+                                        <span class="badge bg-warning-subtle text-warning"><i class="bi bi-clock-history me-1"></i> Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    {% if not d.is_verified %}
+                                        <form method="POST" action="{{ url_for('admin.verify_doctor', doctor_id=d.id) }}" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-success btn-rounded px-3">
+                                                Approve License
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form method="POST" action="{{ url_for('admin.reject_doctor', doctor_id=d.id) }}" class="d-inline" onsubmit="return confirm('Suspend/Deactivate this doctor verification?');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger btn-rounded px-3">
+                                                Suspend
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5 text-muted small">
+                No doctor records match this filter.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

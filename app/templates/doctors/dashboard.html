@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Clinical Dashboard - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                {{ doctor.doctor_name }}'s Clinic Portal 🩺
+            </h2>
+            <p class="text-muted mb-0">{{ doctor.specialty }} &bull; {{ doctor.clinic_affiliation }}</p>
+        </div>
+        <div>
+            <a href="{{ url_for('doctors.availability') }}" class="btn btn-lc-primary btn-rounded shadow-sm">
+                <i class="bi bi-calendar-plus me-1"></i> Manage Schedules
+            </a>
+        </div>
+    </div>
+
+    <!-- Verification Notice Banner if not yet verified -->
+    {% if not doctor.is_verified %}
+        <div class="alert alert-warning rounded-4 border-0 mb-4 d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill fs-4 text-warning me-3"></i>
+            <div>
+                <strong>Verification Pending:</strong> Your medical credentials (PRC License: {{ doctor.license_number }}) are currently being verified by the LittleCare administrative team. Once approved, your profile will be publicly bookable.
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Top Metrics -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-info-subtle text-primary"><i class="bi bi-calendar2-day"></i></div>
+                <div>
+                    <small class="text-muted d-block">Today's Patients</small>
+                    <h4 class="fw-bold mb-0 text-dark">{{ today_appointments|length }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-clock-history"></i></div>
+                <div>
+                    <small class="text-muted d-block">Pending Requests</small>
+                    <h4 class="fw-bold mb-0 text-dark">{{ pending_appointments|length }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-calendar-check"></i></div>
+                <div>
+                    <small class="text-muted d-block">Upcoming Visits</small>
+                    <h4 class="fw-bold mb-0 text-dark">{{ upcoming_appointments|length }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-calendar3"></i></div>
+                <div>
+                    <small class="text-muted d-block">Active Schedules</small>
+                    <h4 class="fw-bold mb-0 text-dark">{{ active_schedules }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- PENDING REQUESTS -->
+        <div class="col-lg-6">
+            <div class="lc-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-person-exclamation text-warning me-2"></i> Pending Consultation Requests
+                    </h5>
+                    <span class="badge bg-warning-subtle text-warning">{{ pending_appointments|length }} Pending</span>
+                </div>
+
+                {% if pending_appointments %}
+                    <div class="list-group list-group-flush">
+                        {% for apt in pending_appointments %}
+                            <div class="list-group-item px-0 py-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="fw-bold mb-0 text-dark">{{ apt.baby.name }} ({{ apt.baby.age_display }})</h6>
+                                        <small class="text-muted">Parent: {{ apt.parent.full_name }} &bull; {{ apt.parent.phone or 'No phone' }}</small>
+                                    </div>
+                                    <span class="badge badge-blue">{{ apt.consultation_type }}</span>
+                                </div>
+                                <div class="p-2 rounded-3 bg-light small text-muted mb-2">
+                                    <strong>Requested Time:</strong> {{ apt.formatted_datetime }}<br>
+                                    <strong>Reason:</strong> {{ apt.reason_for_visit }}
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ url_for('doctors.review_appointment', appointment_id=apt.id) }}" class="btn btn-sm btn-lc-primary btn-rounded flex-grow-1">
+                                        <i class="bi bi-clipboard2-pulse me-1"></i> Review & Accept
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5 text-muted small">
+                        <i class="bi bi-check-circle text-success fs-3 d-block mb-2"></i>
+                        No pending appointment requests to review.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- TODAY'S SCHEDULE & UPCOMING -->
+        <div class="col-lg-6">
+            <div class="lc-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-calendar-event text-primary me-2"></i> Today's Consultations
+                    </h5>
+                    <span class="badge bg-info-subtle text-primary">{{ today_appointments|length }} Patients</span>
+                </div>
+
+                {% if today_appointments %}
+                    <div class="list-group list-group-flush">
+                        {% for apt in today_appointments %}
+                            <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-bold text-dark">{{ apt.appointment_time.strftime('%I:%M %p') }} - {{ apt.baby.name }}</div>
+                                    <small class="text-muted">{{ apt.reason_for_visit[:60] }}...</small>
+                                </div>
+                                <div>
+                                    <a href="{{ url_for('doctors.review_appointment', appointment_id=apt.id) }}" class="btn btn-sm btn-outline-primary btn-rounded">
+                                        Consultation Notes
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4 text-muted small">
+                        No appointments scheduled for today.
+                    </div>
+                {% endif %}
+
+                <!-- Upcoming Section -->
+                <h6 class="fw-bold text-dark mt-4 mb-3">Upcoming Confirmed Visits</h6>
+                {% if upcoming_appointments %}
+                    <div class="list-group list-group-flush small">
+                        {% for apt in upcoming_appointments %}
+                            <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="fw-bold">{{ apt.formatted_datetime }}</span>: {{ apt.baby.name }}
+                                </div>
+                                <a href="{{ url_for('doctors.review_appointment', appointment_id=apt.id) }}" class="btn btn-sm btn-light rounded-pill">View</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-muted small">No upcoming visits booked for later this week.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

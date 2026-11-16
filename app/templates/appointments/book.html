@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Book Consultation with {{ doctor.doctor_name }} - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <!-- Doctor Header Card -->
+            <div class="lc-card p-4 mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="rounded-circle bg-info-subtle text-primary fw-bold d-inline-flex align-items-center justify-content-center border" style="width: 72px; height: 72px; font-size: 1.8rem;">
+                        {{ doctor.user.first_name[0] }}
+                    </span>
+                    <div>
+                        <h4 class="fw-bold text-dark mb-0">Book Consultation with {{ doctor.doctor_name }}</h4>
+                        <div class="text-muted small">
+                            <span class="badge badge-mint me-1">{{ doctor.specialty }}</span>
+                            <span class="text-success"><i class="bi bi-patch-check-fill"></i> Verified</span>
+                            &bull; {{ doctor.clinic_affiliation }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Form Card -->
+            <div class="lc-card p-4 p-md-5">
+                <h5 class="fw-bold text-dark mb-3">Appointment Details</h5>
+                <form method="POST" id="booking-form">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.baby_id.label }}</label>
+                        {{ form.baby_id(class="form-select rounded-pill px-3 py-2") }}
+                        {% for error in form.baby_id.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.appointment_date.label }}</label>
+                            {{ form.appointment_date(class="form-control rounded-pill px-3 py-2", id="appointment-date-picker") }}
+                            {% for error in form.appointment_date.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.appointment_time.label }}</label>
+                            {{ form.appointment_time(class="form-select rounded-pill px-3 py-2", id="appointment-time-select") }}
+                            {% for error in form.appointment_time.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                            <small class="text-muted" style="font-size: 0.75rem;">Double-booking prevention active.</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.consultation_type.label }}</label>
+                        {{ form.consultation_type(class="form-select rounded-pill px-3 py-2") }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small">{{ form.reason_for_visit.label }}</label>
+                        {{ form.reason_for_visit(class="form-control rounded-4 px-3 py-2", rows="3", placeholder="Describe your baby's symptoms, fever, milestone questions, or general routine checkup reasons...") }}
+                        {% for error in form.reason_for_visit.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="p-3 rounded-4 bg-light border mb-4 small text-muted">
+                        <i class="bi bi-shield-check text-success me-1"></i>
+                        <strong>Privacy Notice:</strong> By submitting this request, you authorize Dr. {{ doctor.user.last_name }} to view your baby's relevant health summary (growth percentiles, vaccines) strictly for the purpose of this clinical consultation.
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        {{ form.submit(class="btn btn-lc-primary btn-rounded flex-grow-1 py-2") }}
+                        <a href="{{ url_for('doctors.directory') }}" class="btn btn-light rounded-pill px-4">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const datePicker = document.getElementById('appointment-date-picker');
+        const timeSelect = document.getElementById('appointment-time-select');
+        const doctorId = {{ doctor.id }};
+
+        if (datePicker && timeSelect) {
+            datePicker.addEventListener('change', function() {
+                const selectedDate = this.value;
+                if (!selectedDate) return;
+
+                fetch(`/appointments/api/available-slots/${doctorId}/${selectedDate}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        timeSelect.innerHTML = '';
+                        if (data.slots && data.slots.length > 0) {
+                            data.slots.forEach(s => {
+                                const opt = document.createElement('option');
+                                opt.value = s.time;
+                                opt.textContent = s.label;
+                                timeSelect.appendChild(opt);
+                            });
+                        } else {
+                            const opt = document.createElement('option');
+                            opt.value = '';
+                            opt.textContent = 'No available slots on this date';
+                            timeSelect.appendChild(opt);
+                        }
+                    })
+                    .catch(() => {});
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if is_edit else 'Add' }} Growth Measurement - {{ baby.name }} | LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="lc-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <span class="rounded-circle bg-info-subtle p-3 text-primary d-inline-flex mb-2">
+                        <i class="bi bi-graph-up fs-2"></i>
+                    </span>
+                    <h3 class="fw-bold text-dark">{{ 'Edit' if is_edit else 'Log' }} Growth Entry</h3>
+                    <p class="text-muted small">Record physical measurements for <strong>{{ baby.name }}</strong></p>
+                </div>
+
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.recorded_date.label }}</label>
+                        {{ form.recorded_date(class="form-control rounded-pill px-3 py-2") }}
+                        {% for error in form.recorded_date.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.weight_kg.label }}</label>
+                            {{ form.weight_kg(class="form-control rounded-pill px-3 py-2", placeholder="e.g. 7.2") }}
+                            {% for error in form.weight_kg.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.height_cm.label }}</label>
+                            {{ form.height_cm(class="form-control rounded-pill px-3 py-2", placeholder="e.g. 65.0") }}
+                            {% for error in form.height_cm.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.head_circumference_cm.label }}</label>
+                        {{ form.head_circumference_cm(class="form-control rounded-pill px-3 py-2", placeholder="e.g. 42.5 (optional)") }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small">{{ form.notes.label }}</label>
+                        {{ form.notes(class="form-control rounded-4 px-3 py-2", rows="2", placeholder="Optional notes (e.g. measured after morning feed, clinic scale)") }}
+                    </div>
+
+                    {{ form.submit(class="btn btn-lc-primary btn-rounded w-100 py-2 mb-2") }}
+                    <a href="{{ url_for('health.growth') }}" class="btn btn-light rounded-pill w-100 text-muted">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

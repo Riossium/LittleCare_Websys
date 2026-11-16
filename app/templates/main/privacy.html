@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy & Data Protection - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="lc-card p-4 p-md-5">
+                <span class="badge badge-mint px-3 py-2 rounded-pill mb-3">Compliance & Trust</span>
+                <h1 class="fw-bold text-dark mb-4">Data Privacy & Security Policy</h1>
+                <p class="text-muted leading-relaxed">
+                    LittleCare operates in strict adherence to Republic Act No. 10173, also known as the <strong>Data Privacy Act of 2012 (DPA)</strong> of the Philippines, and its Implementing Rules and Regulations. As a healthcare information management platform, we prioritize the confidentiality and integrity of infant health records above all else.
+                </p>
+
+                <hr class="my-4">
+
+                <h4 class="fw-bold text-dark mb-3">1. Personal & Sensitive Health Data We Collect</h4>
+                <p class="text-muted small">
+                    To deliver personalized healthcare management services, we process information including:
+                </p>
+                <ul class="text-muted small">
+                    <li><strong>Parent & Guardian Account Information:</strong> Full name, verified email address, contact numbers, hashed passwords.</li>
+                    <li><strong>Baby Health Profile Data:</strong> Baby’s name, date of birth, sex, birth weight, birth height, head circumference, blood type, known allergies, and medical checkup notes.</li>
+                    <li><strong>Immunization & Clinical Records:</strong> Administered vaccines, batch details, scheduled visits, and uploaded medical documentation.</li>
+                    <li><strong>Physician Professional Credentials:</strong> PRC Medical License numbers, clinic affiliations, practice specialties, and availability schedules.</li>
+                </ul>
+
+                <h4 class="fw-bold text-dark mb-3 mt-4">2. Role-Based Access Control & Strict Parent Ownership</h4>
+                <p class="text-muted small">
+                    Baby health profiles are linked directly to authorized parent accounts. Other parents cannot view or search your baby's medical information. Doctors only receive temporary, read-only access to a baby's clinical summary when you explicitly request and book an appointment with that physician.
+                </p>
+
+                <h4 class="fw-bold text-dark mb-3 mt-4">3. AI Context Retrieval & Parental Authorization</h4>
+                <p class="text-muted small">
+                    The LittleCare AI Healthcare Assistant requires explicit opt-in parental authorization before referencing baby profile data. When granted, only essential context (age, latest measurements, allergies) is provided to provide tailored educational guidance. All prompts and API credentials are kept securely on our backend servers and never exposed to public frontend scripts.
+                </p>
+
+                <h4 class="fw-bold text-dark mb-3 mt-4">4. Audit Trails & Security Measures</h4>
+                <p class="text-muted small">
+                    All sensitive access events (viewing patient records, AI context retrieval, verification approvals) are captured in our tamper-resistant security audit log for accountability.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

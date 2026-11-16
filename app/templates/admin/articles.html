@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Healthcare Articles - LittleCare Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Healthcare Articles Management</h2>
+            <p class="text-muted mb-0">Create, edit, and publish pediatric healthcare resources</p>
+        </div>
+        <div>
+            <a href="{{ url_for('admin.create_article') }}" class="btn btn-lc-mint btn-rounded">
+                <i class="bi bi-plus-circle me-1"></i> Add New Article
+            </a>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-rounded ms-2">
+                Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="lc-card p-4">
+        {% if articles %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small text-muted">
+                        <tr>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Author</th>
+                            <th>Read Time</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in articles %}
+                            <tr>
+                                <td>
+                                    <strong class="text-dark d-block">{{ a.title }}</strong>
+                                    <small class="text-muted">{{ a.short_description[:75] }}...</small>
+                                </td>
+                                <td><span class="badge badge-blue">{{ a.category }}</span></td>
+                                <td class="small text-muted">{{ a.author_name }}</td>
+                                <td class="small text-muted">{{ a.reading_time_minutes }} mins</td>
+                                <td>
+                                    {% if a.is_published %}
+                                        <span class="badge bg-success-subtle text-success">Published</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary-subtle text-secondary">Draft</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small text-muted">{{ a.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('articles.detail', slug=a.slug) }}" target="_blank" class="btn btn-sm btn-light rounded-pill me-1" title="Preview">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin.edit_article', article_id=a.id) }}" class="btn btn-sm btn-light rounded-pill me-1" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('admin.delete_article', article_id=a.id) }}" class="d-inline" onsubmit="return confirm('Delete this article?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5 text-muted small">
+                No healthcare articles published yet. Click "Add New Article" to write your first pediatric guide.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

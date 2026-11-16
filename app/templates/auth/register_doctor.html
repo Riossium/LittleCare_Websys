@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Registration & Verification - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9 col-lg-7">
+            <div class="lc-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <span class="rounded-circle bg-info-subtle p-3 text-primary d-inline-flex mb-2">
+                        <i class="bi bi-hospital fs-2"></i>
+                    </span>
+                    <h3 class="fw-bold text-dark">Join as a Pediatrician</h3>
+                    <p class="text-muted small">Register your professional credentials for administrator verification</p>
+                </div>
+
+                <div class="alert alert-info rounded-4 border-0 small mb-4">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    All physician registrations require valid PRC Medical License verification before clinical profiles are activated on the public directory.
+                </div>
+
+                <form method="POST" action="{{ url_for('auth.register_doctor') }}">
+                    {{ form.hidden_tag() }}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.first_name.label }}</label>
+                            {{ form.first_name(class="form-control rounded-pill px-3 py-2", placeholder="First name") }}
+                            {% for error in form.first_name.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.last_name.label }}</label>
+                            {{ form.last_name(class="form-control rounded-pill px-3 py-2", placeholder="Last name") }}
+                            {% for error in form.last_name.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.email.label }}</label>
+                            {{ form.email(class="form-control rounded-pill px-3 py-2", placeholder="doctor@clinic.com") }}
+                            {% for error in form.email.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.phone.label }}</label>
+                            {{ form.phone(class="form-control rounded-pill px-3 py-2", placeholder="Clinic phone number") }}
+                            {% for error in form.phone.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.specialty.label }}</label>
+                            {{ form.specialty(class="form-select rounded-pill px-3 py-2") }}
+                            {% for error in form.specialty.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.license_number.label }}</label>
+                            {{ form.license_number(class="form-control rounded-pill px-3 py-2", placeholder="PRC License No.") }}
+                            {% for error in form.license_number.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.clinic_affiliation.label }}</label>
+                            {{ form.clinic_affiliation(class="form-control rounded-pill px-3 py-2", placeholder="e.g. St. Luke's / Child Care Clinic") }}
+                            {% for error in form.clinic_affiliation.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.experience_years.label }}</label>
+                            {{ form.experience_years(class="form-control rounded-pill px-3 py-2") }}
+                            {% for error in form.experience_years.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.consultation_types.label }}</label>
+                        {{ form.consultation_types(class="form-select rounded-pill px-3 py-2") }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.bio.label }}</label>
+                        {{ form.bio(class="form-control rounded-4 px-3 py-2", rows="3", placeholder="Brief overview of clinical focus, subspecialty training, or hospital appointments...") }}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.password.label }}</label>
+                            {{ form.password(class="form-control rounded-pill px-3 py-2", placeholder="Choose password") }}
+                            {% for error in form.password.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.confirm_password.label }}</label>
+                            {{ form.confirm_password(class="form-control rounded-pill px-3 py-2", placeholder="Confirm password") }}
+                            {% for error in form.confirm_password.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4 form-check">
+                        {{ form.agree_terms(class="form-check-input") }}
+                        <label class="form-check-label small text-muted" for="agree_terms">
+                            {{ form.agree_terms.label.text }}
+                        </label>
+                        {% for error in form.agree_terms.errors %}
+                            <div class="text-danger small mt-1 d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    {{ form.submit(class="btn btn-lc-primary btn-rounded w-100 py-2 mb-3") }}
+
+                    <div class="text-center text-muted small">
+                        Already registered as a doctor?
+                        <a href="{{ url_for('auth.login') }}" class="fw-bold text-primary text-decoration-none">Sign In</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

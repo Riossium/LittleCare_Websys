@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Vaccination Records - {{ baby.name }} | LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Immunization Schedule: {{ baby.name }}</h2>
+            <p class="text-muted mb-0">Monitor scheduled, administered, and upcoming pediatric vaccinations</p>
+        </div>
+        <div>
+            <a href="{{ url_for('health.add_vaccination') }}" class="btn btn-lc-mint btn-rounded shadow-sm">
+                <i class="bi bi-shield-plus me-1"></i> Log Vaccine Dose
+            </a>
+        </div>
+    </div>
+
+    <!-- Official Guideline Banner -->
+    <div class="p-4 rounded-4 bg-white border shadow-sm mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h5 class="fw-bold text-dark mb-1"><i class="bi bi-shield-check text-success me-2"></i> Standard Immunization Schedule</h5>
+                <p class="text-muted small mb-0">Aligned with World Health Organization (WHO) & Philippine Pediatric Society recommendations.</p>
+            </div>
+            <a href="{{ url_for('articles.index', category='Vaccination Guide') }}" class="btn btn-sm btn-outline-success btn-rounded">
+                <i class="bi bi-journal-bookmark me-1"></i> Read Vaccination Guide
+            </a>
+        </div>
+    </div>
+
+    <!-- Records Table Card -->
+    <div class="lc-card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0 text-dark">Recorded Vaccines</h5>
+            <span class="text-muted small">{{ records|length }} doses logged</span>
+        </div>
+
+        {% if records %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr class="small text-muted">
+                            <th>Vaccine Name</th>
+                            <th>Dose</th>
+                            <th>Date Given</th>
+                            <th>Next Scheduled</th>
+                            <th>Status</th>
+                            <th>Administered By</th>
+                            <th>Lot/Batch</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for v in records %}
+                            <tr>
+                                <td class="fw-bold text-dark">{{ v.vaccine_name }}</td>
+                                <td>Dose {{ v.dose_number }}</td>
+                                <td>{{ v.date_administered.strftime('%B %d, %Y') if v.date_administered else '-' }}</td>
+                                <td>
+                                    {% if v.next_scheduled_date %}
+                                        <span class="{% if v.is_overdue %}text-danger fw-bold{% elif v.is_due_soon %}text-warning fw-bold{% else %}text-muted{% endif %}">
+                                            {{ v.next_scheduled_date.strftime('%B %d, %Y') }}
+                                        </span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if v.status == 'completed' %}
+                                        <span class="badge badge-mint"><i class="bi bi-check-circle-fill me-1"></i> Completed</span>
+                                    {% elif v.status == 'scheduled' %}
+                                        <span class="badge badge-blue"><i class="bi bi-clock-fill me-1"></i> Scheduled</span>
+                                    {% elif v.status == 'missed' %}
+                                        <span class="badge bg-danger-subtle text-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i> Missed</span>
+                                    {% else %}
+                                        <span class="badge badge-yellow">{{ v.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small text-muted">{{ v.administered_by or '-' }}</td>
+                                <td class="small text-muted font-monospace">{{ v.batch_number or '-' }}</td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('health.edit_vaccination', record_id=v.id) }}" class="btn btn-sm btn-light rounded-pill me-1" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('health.delete_vaccination', record_id=v.id) }}" class="d-inline" onsubmit="return confirm('Delete this vaccine record?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4 text-muted small">
+                No vaccination records logged yet. Click "Log Vaccine Dose" above to add your baby's immunizations.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

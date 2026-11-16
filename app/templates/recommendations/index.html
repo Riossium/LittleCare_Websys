@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Smart Pediatric Recommendations - {{ baby.name }} | LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Smart Healthcare Recommendations</h2>
+            <p class="text-muted mb-0">Rule-based pediatric insights & AI suggestions tailored for <strong>{{ baby.name }}</strong> ({{ baby.age_display }})</p>
+        </div>
+        <div>
+            <a href="{{ url_for('ai.index') }}" class="btn btn-lc-pink btn-rounded">
+                <i class="bi bi-robot me-1"></i> Ask AI Assistant
+            </a>
+        </div>
+    </div>
+
+    <!-- Pediatric Guidance Notice -->
+    <div class="p-4 rounded-4 bg-white border shadow-sm mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <span class="rounded-circle bg-warning-subtle text-warning p-3 fs-3">
+                <i class="bi bi-lightbulb-fill"></i>
+            </span>
+            <div>
+                <h5 class="fw-bold text-dark mb-1">About LittleCare Recommendations</h5>
+                <p class="text-muted small mb-0">
+                    Recommendations are proactively generated based on your baby's exact age in months, logged growth measurements, and recorded immunizations. They are educational and non-alarming, aimed at helping you stay ahead of important pediatric milestones.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendations Grouped by Category -->
+    {% if recommendations %}
+        <div class="row g-4">
+            {% for rec in recommendations %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="lc-card p-4 h-100 d-flex flex-column border-top border-4 border-{{ rec.badge_class }}">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge badge-{{ rec.badge_class }}">{{ rec.category }}</span>
+                            <form method="POST" action="{{ url_for('recommendations.dismiss', rec_id=rec.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-link text-muted p-0" title="Dismiss suggestion">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-2">{{ rec.title }}</h5>
+                        <p class="text-muted small mb-4 flex-grow-1">{{ rec.description }}</p>
+
+                        {% if rec.action_url %}
+                            <div class="border-top pt-3 mt-auto">
+                                <a href="{{ rec.action_url }}" class="btn btn-sm btn-outline-primary btn-rounded w-100">
+                                    <i class="bi bi-arrow-right-circle me-1"></i> {{ rec.action_label or 'Take Action' }}
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="stat-icon bg-success-subtle text-success mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                <i class="bi bi-check2-circle"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">All Milestones Up To Date!</h4>
+            <p class="text-muted max-w-700 mx-auto mb-4">
+                {{ baby.name }}'s growth records and vaccination history have no immediate pending alerts. Keep up the wonderful care!
+            </p>
+            <a href="{{ url_for('parent.dashboard') }}" class="btn btn-lc-primary btn-rounded px-4">
+                Back to Dashboard
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}My Consultation Requests - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">My Doctor Consultations</h2>
+            <p class="text-muted mb-0">Track status, scheduled visits, and doctor consultation notes</p>
+        </div>
+        <a href="{{ url_for('doctors.directory') }}" class="btn btn-lc-primary btn-rounded">
+            <i class="bi bi-calendar2-plus me-1"></i> Book New Consultation
+        </a>
+    </div>
+
+    <!-- Status Filters -->
+    <div class="d-flex gap-2 overflow-auto pb-2 mb-4">
+        <a href="{{ url_for('appointments.my_appointments', status='all') }}" class="btn btn-sm rounded-pill px-3 {% if current_status == 'all' %}btn-primary{% else %}btn-light border{% endif %}">
+            All Visits
+        </a>
+        <a href="{{ url_for('appointments.my_appointments', status='Pending') }}" class="btn btn-sm rounded-pill px-3 {% if current_status == 'Pending' %}btn-warning text-dark{% else %}btn-light border{% endif %}">
+            Pending Approval
+        </a>
+        <a href="{{ url_for('appointments.my_appointments', status='Confirmed') }}" class="btn btn-sm rounded-pill px-3 {% if current_status == 'Confirmed' %}btn-success{% else %}btn-light border{% endif %}">
+            Confirmed
+        </a>
+        <a href="{{ url_for('appointments.my_appointments', status='Completed') }}" class="btn btn-sm rounded-pill px-3 {% if current_status == 'Completed' %}btn-info text-white{% else %}btn-light border{% endif %}">
+            Completed
+        </a>
+    </div>
+
+    {% if appointments %}
+        <div class="d-flex flex-column gap-3">
+            {% for apt in appointments %}
+                <div class="lc-card p-4">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="rounded-circle bg-info-subtle text-primary fw-bold d-inline-flex align-items-center justify-content-center" style="width: 58px; height: 58px; font-size: 1.5rem;">
+                                {{ apt.doctor.user.first_name[0] }}
+                            </span>
+                            <div>
+                                <h5 class="fw-bold text-dark mb-0">{{ apt.doctor.doctor_name }}</h5>
+                                <div class="text-muted small">
+                                    {{ apt.doctor.specialty }} &bull; Patient: <strong class="text-dark">{{ apt.baby.name }}</strong> ({{ apt.baby.age_display }})
+                                </div>
+                                <div class="small text-primary fw-bold mt-1">
+                                    <i class="bi bi-calendar-event me-1"></i> {{ apt.formatted_datetime }} &bull; {{ apt.consultation_type }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-{{ apt.status_badge_class }}-subtle text-{{ apt.status_badge_class }} fs-6 px-3 py-2">
+                                {{ apt.status }}
+                            </span>
+                            <a href="{{ url_for('appointments.detail', appointment_id=apt.id) }}" class="btn btn-sm btn-outline-primary btn-rounded">
+                                View Details
+                            </a>
+                            {% if apt.status in ['Pending', 'Confirmed'] %}
+                                <form method="POST" action="{{ url_for('appointments.cancel', appointment_id=apt.id) }}" onsubmit="return confirm('Cancel this consultation request?');" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger btn-rounded">
+                                        Cancel
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if apt.doctor_notes %}
+                        <div class="mt-3 pt-3 border-top bg-light p-3 rounded-4 small">
+                            <strong class="text-dark d-block mb-1"><i class="bi bi-prescription2 text-primary me-1"></i> Doctor's Consultation Notes & Advice:</strong>
+                            <p class="mb-0 text-muted">{{ apt.doctor_notes }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="stat-icon bg-info-subtle text-primary mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                <i class="bi bi-calendar-x"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">No Appointments Found</h4>
+            <p class="text-muted max-w-700 mx-auto mb-4">
+                You currently have no consultations matching this filter. Browse our verified pediatricians to book your baby's visit.
+            </p>
+            <a href="{{ url_for('doctors.directory') }}" class="btn btn-lc-primary btn-rounded px-4">
+                Find a Doctor
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications & Reminders - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">Notifications & Healthcare Reminders</h2>
+                    <p class="text-muted mb-0">Stay informed about appointment updates, vaccination due dates, and system alerts</p>
+                </div>
+                {% if notifications %}
+                    <form method="POST" action="{{ url_for('notifications.mark_all_read') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill">
+                            <i class="bi bi-check2-all me-1"></i> Mark All as Read
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+
+            {% if notifications %}
+                <div class="d-flex flex-column gap-2">
+                    {% for n in notifications %}
+                        <div class="lc-card p-3 d-flex align-items-start gap-3 {% if not n.is_read %}border-primary border-start border-4 bg-light{% endif %}">
+                            <span class="rounded-circle bg-white p-2 border shadow-sm fs-5">
+                                <i class="bi {{ n.icon_class }}"></i>
+                            </span>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong class="text-dark small">{{ n.title }}</strong>
+                                    <small class="text-muted" style="font-size: 0.75rem;">{{ n.created_at.strftime('%b %d, %I:%M %p') }}</small>
+                                </div>
+                                <p class="text-muted small mb-2">{{ n.message }}</p>
+                                <div class="d-flex gap-2">
+                                    {% if n.link %}
+                                        <form method="POST" action="{{ url_for('notifications.mark_read', notif_id=n.id) }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-primary btn-rounded py-1 px-3" style="font-size: 0.8rem;">
+                                                View Update <i class="bi bi-arrow-right"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    {% if not n.is_read %}
+                                        <form method="POST" action="{{ url_for('notifications.mark_read', notif_id=n.id) }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-light border rounded-pill py-1 px-3 text-muted" style="font-size: 0.8rem;">
+                                                Mark Read
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="stat-icon bg-info-subtle text-primary mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                        <i class="bi bi-bell-slash"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark mb-2">No Notifications</h4>
+                    <p class="text-muted max-w-700 mx-auto mb-0">
+                        You have no notifications or reminders at this time. Upcoming appointment confirmations and vaccination alerts will appear here.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

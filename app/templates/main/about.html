@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}About Us - LittleCare Pediatric Health Management{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center g-5 mb-5">
+        <div class="col-lg-6">
+            <span class="badge badge-pink px-3 py-2 rounded-pill mb-3">About LittleCare</span>
+            <h1 class="fw-bold text-dark mb-4">Dedicated to Simplifying Infant Healthcare for Every Family</h1>
+            <p class="text-muted leading-relaxed mb-3">
+                Caring for a newborn or infant is one of life's most rewarding experiences, but managing pediatric schedules, vaccination cards, growth milestones, and medical histories across different clinics can quickly become overwhelming.
+            </p>
+            <p class="text-muted leading-relaxed mb-4">
+                <strong>LittleCare</strong> was built to give parents peace of mind. By combining intuitive health record management, evidence-based WHO growth tracking, verified doctor consultations, and a scientifically grounded AI assistant, LittleCare bridges the gap between everyday home care and professional pediatric guidance.
+            </p>
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="p-3 rounded-4 bg-white border shadow-sm">
+                        <h4 class="fw-bold text-primary mb-1">100%</h4>
+                        <small class="text-muted">Healthcare-Focused (No E-Commerce)</small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 rounded-4 bg-white border shadow-sm">
+                        <h4 class="fw-bold text-success mb-1">PRC</h4>
+                        <small class="text-muted">Verified Pediatric Specialists</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="lc-card p-4 p-md-5">
+                <h4 class="fw-bold mb-3"><i class="bi bi-compass text-primary me-2"></i> Our Core Principles</h4>
+                <ul class="list-unstyled d-flex flex-column gap-3 mb-0">
+                    <li class="d-flex align-items-start gap-3">
+                        <div class="rounded-circle bg-info-subtle text-primary p-2 fs-5"><i class="bi bi-shield-lock-fill"></i></div>
+                        <div>
+                            <strong>Strict Privacy & Ownership</strong>
+                            <p class="text-muted small mb-0">Compliant with the Philippine Data Privacy Act of 2012. Parents maintain full control over who sees their child's health records.</p>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-start gap-3">
+                        <div class="rounded-circle bg-danger-subtle text-danger p-2 fs-5"><i class="bi bi-heart-pulse-fill"></i></div>
+                        <div>
+                            <strong>Pediatric Clinical Safety</strong>
+                            <p class="text-muted small mb-0">Our AI tools do not guess diagnoses or prescribe medication. They guide and encourage timely consultations with verified medical providers.</p>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-start gap-3">
+                        <div class="rounded-circle bg-success-subtle text-success p-2 fs-5"><i class="bi bi-graph-up"></i></div>
+                        <div>
+                            <strong>Evidence-Based Tracking</strong>
+                            <p class="text-muted small mb-0">Growth percentile curves and vaccination schedules are strictly aligned with World Health Organization (WHO) and Philippine Pediatric Society standards.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

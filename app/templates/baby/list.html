@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Baby Profiles - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Baby Profiles</h2>
+            <p class="text-muted mb-0">Manage healthcare profiles for your children</p>
+        </div>
+        <a href="{{ url_for('baby.create') }}" class="btn btn-lc-primary btn-rounded">
+            <i class="bi bi-plus-circle-fill me-1"></i> Add Baby Profile
+        </a>
+    </div>
+
+    {% if not babies %}
+        <div class="empty-state">
+            <div class="stat-icon bg-pink-subtle text-danger mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2.5rem; background-color: var(--primary-pink-soft);">
+                <i class="bi bi-person-heart"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">No Baby Profiles Yet</h4>
+            <p class="text-muted max-w-700 mx-auto mb-4">
+                Add your baby's profile to begin tracking growth percentiles, logging vaccines, and getting smart healthcare reminders.
+            </p>
+            <a href="{{ url_for('baby.create') }}" class="btn btn-lc-primary btn-rounded px-4">
+                <i class="bi bi-plus-circle-fill me-1"></i> Add Baby Profile
+            </a>
+        </div>
+    {% else %}
+        <div class="row g-4">
+            {% for b in babies %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="lc-card h-100 p-4 d-flex flex-column {% if active_baby_id == b.id %}border-primary border-2{% endif %}">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="rounded-circle bg-info-subtle text-primary fw-bold d-inline-flex align-items-center justify-content-center border" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                                {{ b.name[0] }}
+                            </span>
+                            {% if active_baby_id == b.id %}
+                                <span class="badge bg-primary text-white"><i class="bi bi-check2-circle me-1"></i> Active Profile</span>
+                            {% else %}
+                                <a href="{{ url_for('baby.select', baby_id=b.id) }}" class="btn btn-sm btn-outline-primary btn-rounded">Select Active</a>
+                            {% endif %}
+                        </div>
+
+                        <h4 class="fw-bold text-dark mb-1">{{ b.name }}</h4>
+                        <div class="d-flex gap-2 mb-3">
+                            <span class="badge badge-blue">{{ b.gender|capitalize }}</span>
+                            <span class="badge badge-pink">{{ b.age_display }}</span>
+                            {% if b.blood_type %}<span class="badge bg-light text-dark border">{{ b.blood_type }}</span>{% endif %}
+                        </div>
+
+                        <div class="small text-muted mb-3">
+                            <div><i class="bi bi-balloon me-1 text-danger"></i> <strong>Born:</strong> {{ b.date_of_birth.strftime('%b %d, %Y') }}</div>
+                            {% if b.birth_weight %}
+                                <div><i class="bi bi-speedometer me-1 text-success"></i> <strong>Birth Weight:</strong> {{ b.birth_weight }} kg</div>
+                            {% endif %}
+                            {% if b.allergies %}
+                                <div class="text-danger"><i class="bi bi-exclamation-triangle me-1"></i> <strong>Allergies:</strong> {{ b.allergies[:40] }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="border-top pt-3 mt-auto d-flex gap-2">
+                            <a href="{{ url_for('baby.view', baby_id=b.id) }}" class="btn btn-sm btn-light border rounded-pill flex-grow-1">
+                                <i class="bi bi-eye me-1"></i> View Health Details
+                            </a>
+                            <a href="{{ url_for('baby.edit', baby_id=b.id) }}" class="btn btn-sm btn-outline-secondary rounded-pill" title="Edit Profile">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

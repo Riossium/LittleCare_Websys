@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Growth Charts - {{ baby.name }} | LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Growth Percentile Curves: {{ baby.name }}</h2>
+            <p class="text-muted mb-0">Track weight, length, and head circumference plotted against WHO Child Growth Standards</p>
+        </div>
+        <div>
+            <a href="{{ url_for('health.add_growth') }}" class="btn btn-lc-primary btn-rounded shadow-sm">
+                <i class="bi bi-plus-circle-fill me-1"></i> Log Measurement
+            </a>
+        </div>
+    </div>
+
+    <!-- Pediatric Safety Disclaimer -->
+    <div class="alert alert-info rounded-4 border-0 d-flex align-items-center mb-4 small">
+        <i class="bi bi-info-circle-fill fs-5 text-primary me-2"></i>
+        <div>
+            <strong>Pediatric Clinical Reference:</strong> Growth charts plot your baby's physical development against World Health Organization (WHO) international percentile standards. Percentiles indicate developmental trajectories and do not represent a diagnosis. Every child grows at an individual pace; consult your pediatrician for comprehensive evaluations.
+        </div>
+    </div>
+
+    <!-- Chart Card -->
+    <div class="lc-card p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-graph-up text-primary me-2"></i> Weight-for-Age Progression</h5>
+            <span class="badge badge-blue">WHO Percentile Standards</span>
+        </div>
+        <div style="height: 380px; position: relative;">
+            <canvas id="growthCanvas"></canvas>
+        </div>
+    </div>
+
+    <!-- Historical Measurements Table -->
+    <div class="lc-card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0 text-dark">Measurement History</h5>
+            <span class="text-muted small">{{ records|length }} records logged</span>
+        </div>
+
+        {% if records %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr class="small text-muted">
+                            <th>Date</th>
+                            <th>Weight (kg)</th>
+                            <th>Length/Height (cm)</th>
+                            <th>Head Circumference</th>
+                            <th>BMI</th>
+                            <th>Notes</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in records %}
+                            <tr>
+                                <td class="fw-bold text-dark">{{ r.recorded_date.strftime('%B %d, %Y') }}</td>
+                                <td><span class="badge badge-blue px-2 py-1">{{ r.weight_kg }} kg</span></td>
+                                <td>{{ r.height_cm }} cm</td>
+                                <td>{{ r.head_circumference_cm ~ ' cm' if r.head_circumference_cm else '-' }}</td>
+                                <td>{{ r.bmi or '-' }}</td>
+                                <td class="text-muted small">{{ r.notes or '-' }}</td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('health.edit_growth', record_id=r.id) }}" class="btn btn-sm btn-light rounded-pill me-1" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('health.delete_growth', record_id=r.id) }}" class="d-inline" onsubmit="return confirm('Delete this measurement?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4 text-muted small">
+                No growth measurements logged yet. Click "Log Measurement" above to plot the first point.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/growth-chart.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        initGrowthChart('growthCanvas', {{ baby.id }});
+    });
+</script>
+{% endblock %}

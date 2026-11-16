@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Appointment #{{ appointment.id }} - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9 col-lg-7">
+            <div class="lc-card p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                    <div>
+                        <h4 class="fw-bold text-dark mb-1">Consultation Summary</h4>
+                        <small class="text-muted">Appointment Reference #LC-{{ appointment.id }}</small>
+                    </div>
+                    <span class="badge bg-{{ appointment.status_badge_class }}-subtle text-{{ appointment.status_badge_class }} fs-6 px-3 py-2">
+                        {{ appointment.status }}
+                    </span>
+                </div>
+
+                <div class="row g-4 mb-4 small text-muted">
+                    <div class="col-sm-6">
+                        <strong class="text-dark d-block">Attending Pediatrician</strong>
+                        {{ appointment.doctor.doctor_name }}<br>
+                        {{ appointment.doctor.specialty }}<br>
+                        {{ appointment.doctor.clinic_affiliation }}
+                    </div>
+                    <div class="col-sm-6">
+                        <strong class="text-dark d-block">Patient Information</strong>
+                        {{ appointment.baby.name }} ({{ appointment.baby.age_display }})<br>
+                        Parent: {{ appointment.parent.full_name }}<br>
+                        Contact: {{ appointment.parent.phone or 'N/A' }}
+                    </div>
+                    <div class="col-sm-6">
+                        <strong class="text-dark d-block">Scheduled Date & Time</strong>
+                        {{ appointment.formatted_datetime }}
+                    </div>
+                    <div class="col-sm-6">
+                        <strong class="text-dark d-block">Consultation Format</strong>
+                        {{ appointment.consultation_type }}
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-4 bg-light mb-4 small">
+                    <strong class="text-dark d-block mb-1">Reason for Consultation:</strong>
+                    <p class="mb-0 text-muted">{{ appointment.reason_for_visit }}</p>
+                </div>
+
+                {% if appointment.doctor_notes %}
+                    <div class="p-4 rounded-4 bg-primary-subtle mb-4">
+                        <h6 class="fw-bold text-primary mb-2"><i class="bi bi-prescription2 me-1"></i> Physician's Clinical Notes & Care Advice:</h6>
+                        <p class="mb-0 text-dark small leading-relaxed">{{ appointment.doctor_notes }}</p>
+                    </div>
+                {% endif %}
+
+                {% if appointment.rejection_reason %}
+                    <div class="p-3 rounded-4 bg-danger-subtle text-danger mb-4 small">
+                        <strong>Reason / Note from Doctor:</strong><br>
+                        {{ appointment.rejection_reason }}
+                    </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                    {% if current_user.is_parent %}
+                        <a href="{{ url_for('appointments.my_appointments') }}" class="btn btn-outline-secondary btn-rounded">
+                            <i class="bi bi-arrow-left me-1"></i> My Appointments
+                        </a>
+                        {% if appointment.status in ['Pending', 'Confirmed'] %}
+                            <form method="POST" action="{{ url_for('appointments.cancel', appointment_id=appointment.id) }}" onsubmit="return confirm('Cancel this consultation?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-outline-danger btn-rounded">Cancel Appointment</button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ url_for('doctors.dashboard') }}" class="btn btn-outline-secondary btn-rounded">
+                            <i class="bi bi-arrow-left me-1"></i> Doctor Dashboard
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

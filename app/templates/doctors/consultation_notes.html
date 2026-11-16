@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Consultation Review - Apt #{{ appointment.id }} | LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Consultation Review & Clinical Notes</h2>
+            <p class="text-muted mb-0">Patient: <strong>{{ baby.name }}</strong> &bull; Scheduled: {{ appointment.formatted_datetime }}</p>
+        </div>
+        <a href="{{ url_for('doctors.dashboard') }}" class="btn btn-outline-secondary btn-rounded">
+            <i class="bi bi-arrow-left me-1"></i> Dashboard
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- AUTHORIZED PATIENT HEALTH SUMMARY -->
+        <div class="col-lg-5">
+            <!-- Baby Profile Card -->
+            <div class="lc-card p-4 mb-4">
+                <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                    <span class="rounded-circle bg-info-subtle text-primary fw-bold d-inline-flex align-items-center justify-content-center" style="width: 56px; height: 56px; font-size: 1.4rem;">
+                        {{ baby.name[0] }}
+                    </span>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">{{ baby.name }}</h5>
+                        <small class="text-muted">{{ baby.gender|capitalize }} &bull; Age: {{ baby.age_display }}</small>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold small text-muted text-uppercase mb-2">Consultation Request Details</h6>
+                <div class="p-3 rounded-4 bg-light mb-3 small">
+                    <strong>Format:</strong> {{ appointment.consultation_type }}<br>
+                    <strong>Parent:</strong> {{ appointment.parent.full_name }} ({{ appointment.parent.phone or 'No phone' }})<br>
+                    <strong>Reason for Consultation:</strong>
+                    <p class="mb-0 mt-1 text-dark">{{ appointment.reason_for_visit }}</p>
+                </div>
+
+                <h6 class="fw-bold small text-muted text-uppercase mb-2">Known Clinical Indicators</h6>
+                <ul class="list-unstyled text-muted small d-flex flex-column gap-1 mb-3">
+                    <li><strong>Blood Type:</strong> {{ baby.blood_type or 'Not recorded' }}</li>
+                    <li><strong>Allergies:</strong> <span class="{% if baby.allergies %}text-danger fw-bold{% endif %}">{{ baby.allergies or 'None reported' }}</span></li>
+                    <li><strong>Birth Info:</strong> {{ baby.birth_weight or 'N/A' }} kg / {{ baby.birth_height or 'N/A' }} cm</li>
+                </ul>
+
+                <!-- Recent Growth -->
+                <h6 class="fw-bold small text-muted text-uppercase mb-2">Recent Growth Logs</h6>
+                {% if growth_history %}
+                    <ul class="list-group list-group-flush small mb-3">
+                        {% for g in growth_history[:3] %}
+                            <li class="list-group-item px-0 py-1 d-flex justify-content-between">
+                                <span>{{ g.recorded_date.strftime('%b %d, %Y') }}</span>
+                                <span class="fw-bold">{{ g.weight_kg }} kg &bull; {{ g.height_cm }} cm</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted small">No prior growth entries.</p>
+                {% endif %}
+
+                <!-- Vaccines -->
+                <h6 class="fw-bold small text-muted text-uppercase mb-2">Immunization History</h6>
+                {% if vaccines %}
+                    <div class="d-flex flex-wrap gap-1">
+                        {% for v in vaccines %}
+                            <span class="badge bg-light text-dark border">{{ v.vaccine_name }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- DOCTOR ACTION & CLINICAL NOTES FORM -->
+        <div class="col-lg-7">
+            <div class="lc-card p-4 p-md-5">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-pencil-square text-primary me-2"></i> Update Appointment & Clinical Advice</h5>
+
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.status.label }}</label>
+                        {{ form.status(class="form-select rounded-pill px-3 py-2") }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.doctor_notes.label }}</label>
+                        {{ form.doctor_notes(class="form-control rounded-4 px-3 py-2", rows="6", placeholder="Provide clinical impressions, recommended care instructions, or follow-up milestones for the parent...") }}
+                        <small class="text-muted" style="font-size: 0.75rem;">These notes will be securely accessible to the parent in their consultation portal.</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small">{{ form.rejection_reason.label }}</label>
+                        {{ form.rejection_reason(class="form-control rounded-4 px-3 py-2", rows="2", placeholder="If declining or proposing an alternate time, enter the reason here...") }}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        {{ form.submit(class="btn btn-lc-primary btn-rounded flex-grow-1 py-2") }}
+                        <a href="{{ url_for('doctors.dashboard') }}" class="btn btn-light rounded-pill px-4">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

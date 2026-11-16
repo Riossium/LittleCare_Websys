@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Medical & Checkup Records - {{ baby.name }} | LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Medical Visits & Checkups: {{ baby.name }}</h2>
+            <p class="text-muted mb-0">Record clinical evaluations, physician findings, and supporting documents</p>
+        </div>
+        <div>
+            <a href="{{ url_for('health.add_checkup') }}" class="btn btn-lc-pink btn-rounded shadow-sm">
+                <i class="bi bi-clipboard2-pulse me-1"></i> Log Medical Visit
+            </a>
+        </div>
+    </div>
+
+    <!-- Checkup Cards List -->
+    {% if records %}
+        <div class="d-flex flex-column gap-3">
+            {% for c in records %}
+                <div class="lc-card p-4">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-3 pb-3 border-bottom">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="rounded-circle bg-danger-subtle text-danger p-3 fs-4">
+                                <i class="bi bi-hospital"></i>
+                            </span>
+                            <div>
+                                <h5 class="fw-bold text-dark mb-0">{{ c.visit_type }}</h5>
+                                <div class="text-muted small">
+                                    <i class="bi bi-calendar-event me-1"></i> {{ c.checkup_date.strftime('%B %d, %Y') }} &bull;
+                                    <i class="bi bi-person-badge me-1"></i> {{ c.provider_name or 'Healthcare Provider' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            {% if c.document_filename %}
+                                <a href="{{ url_for('health.view_document', record_id=c.id) }}" target="_blank" class="btn btn-sm btn-outline-info rounded-pill">
+                                    <i class="bi bi-paperclip me-1"></i> View Attachment
+                                </a>
+                            {% endif %}
+                            <a href="{{ url_for('health.edit_checkup', record_id=c.id) }}" class="btn btn-sm btn-light rounded-pill" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form method="POST" action="{{ url_for('health.delete_checkup', record_id=c.id) }}" onsubmit="return confirm('Delete this checkup record?');" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 text-muted small">
+                        {% if c.diagnosis %}
+                            <div class="col-md-6">
+                                <strong class="text-dark d-block mb-1"><i class="bi bi-stethoscope text-primary me-1"></i> Physician Assessment:</strong>
+                                <p class="mb-0">{{ c.diagnosis }}</p>
+                            </div>
+                        {% endif %}
+                        {% if c.treatment_summary %}
+                            <div class="col-md-6">
+                                <strong class="text-dark d-block mb-1"><i class="bi bi-prescription2 text-success me-1"></i> Treatment & Care Instructions:</strong>
+                                <p class="mb-0">{{ c.treatment_summary }}</p>
+                            </div>
+                        {% endif %}
+                        {% if c.clinical_notes %}
+                            <div class="col-12 mt-2 pt-2 border-top">
+                                <strong class="text-dark d-block mb-1">Parent & Clinical Observations:</strong>
+                                <p class="mb-0">{{ c.clinical_notes }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="stat-icon bg-danger-subtle text-danger mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                <i class="bi bi-clipboard2-pulse"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">No Medical Checkups Logged</h4>
+            <p class="text-muted max-w-700 mx-auto mb-4">
+                Record your visits to the pediatrician, clinic findings, prescriptions, and upload medical certificates.
+            </p>
+            <a href="{{ url_for('health.add_checkup') }}" class="btn btn-lc-pink btn-rounded px-4">
+                <i class="bi bi-plus-circle-fill me-1"></i> Add First Checkup
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

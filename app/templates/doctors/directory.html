@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Find Pediatricians & Specialists - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="text-center max-w-700 mx-auto mb-4">
+        <span class="badge badge-blue px-3 py-2 rounded-pill mb-2">Verified Pediatric Directory</span>
+        <h2 class="fw-bold text-dark">Find Available Pediatricians</h2>
+        <p class="text-muted">Connect with licensed pediatricians for in-clinic evaluations or virtual teleconsultations.</p>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="lc-card p-3 mb-4">
+        <form method="GET" action="{{ url_for('doctors.directory') }}" class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 rounded-start-pill"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0 rounded-end-pill" placeholder="Search doctor name or hospital..." value="{{ search }}">
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <select name="specialty" class="form-select rounded-pill">
+                    <option value="">All Specialties</option>
+                    {% for sp in specialties %}
+                        <option value="{{ sp }}" {% if selected_specialty == sp %}selected{% endif %}>{{ sp }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-lc-primary btn-rounded w-100">
+                    Filter Directory
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Doctors Cards Grid -->
+    {% if doctors %}
+        <div class="row g-4">
+            {% for doc in doctors %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="lc-card p-4 h-100 d-flex flex-column">
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <span class="rounded-circle bg-info-subtle text-primary fw-bold d-inline-flex align-items-center justify-content-center border" style="width: 64px; height: 64px; font-size: 1.6rem;">
+                                {{ doc.user.first_name[0] }}
+                            </span>
+                            <div>
+                                <h5 class="fw-bold text-dark mb-0">{{ doc.doctor_name }}</h5>
+                                <span class="badge badge-mint mb-1">{{ doc.specialty }}</span>
+                                <div class="text-success small fw-bold">
+                                    <i class="bi bi-patch-check-fill me-1"></i> PRC Verified
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-muted small mb-3 flex-grow-1">
+                            <div><i class="bi bi-building me-1 text-primary"></i> <strong>Affiliation:</strong> {{ doc.clinic_affiliation }}</div>
+                            <div><i class="bi bi-award me-1 text-warning"></i> <strong>Experience:</strong> {{ doc.experience_years }} years</div>
+                            <div><i class="bi bi-camera-video me-1 text-info"></i> <strong>Format:</strong> {{ doc.consultation_types }}</div>
+                            {% if doc.bio %}
+                                <p class="mt-2 mb-0 text-muted" style="font-size: 0.8rem;">{{ doc.bio[:95] }}...</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="border-top pt-3 mt-auto d-flex gap-2">
+                            <a href="{{ url_for('doctors.detail', doctor_id=doc.id) }}" class="btn btn-sm btn-light border rounded-pill flex-grow-1">
+                                View Profile
+                            </a>
+                            {% if current_user.is_authenticated and current_user.is_parent %}
+                                <a href="{{ url_for('appointments.book', doctor_id=doc.id) }}" class="btn btn-sm btn-lc-primary btn-rounded flex-grow-1">
+                                    Book Visit
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('auth.login', next=url_for('appointments.book', doctor_id=doc.id)) }}" class="btn btn-sm btn-lc-primary btn-rounded flex-grow-1">
+                                    Sign In to Book
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="stat-icon bg-info-subtle text-primary mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                <i class="bi bi-person-x"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">No Doctors Found</h4>
+            <p class="text-muted max-w-700 mx-auto mb-4">
+                No verified physicians matched your search criteria. Try selecting "All Specialties" or removing search keywords.
+            </p>
+            <a href="{{ url_for('doctors.directory') }}" class="btn btn-outline-primary btn-rounded px-4">
+                Reset Filter
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

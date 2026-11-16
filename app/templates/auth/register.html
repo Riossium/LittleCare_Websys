@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Create Parent Account - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="lc-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <span class="rounded-circle bg-pink-subtle p-3 text-danger d-inline-flex mb-2" style="background-color: var(--primary-pink-soft);">
+                        <i class="bi bi-person-heart fs-2"></i>
+                    </span>
+                    <h3 class="fw-bold text-dark">Create Parent Account</h3>
+                    <p class="text-muted small">Register to track and manage your baby's healthcare</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('auth.register') }}">
+                    {{ form.hidden_tag() }}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.first_name.label }}</label>
+                            {{ form.first_name(class="form-control rounded-pill px-3 py-2", placeholder="First name") }}
+                            {% for error in form.first_name.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.last_name.label }}</label>
+                            {{ form.last_name(class="form-control rounded-pill px-3 py-2", placeholder="Last name") }}
+                            {% for error in form.last_name.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.email.label }}</label>
+                        {{ form.email(class="form-control rounded-pill px-3 py-2", placeholder="name@example.com") }}
+                        {% for error in form.email.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.phone.label }}</label>
+                        {{ form.phone(class="form-control rounded-pill px-3 py-2", placeholder="0917-000-0000") }}
+                        {% for error in form.phone.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.password.label }}</label>
+                            {{ form.password(class="form-control rounded-pill px-3 py-2", placeholder="At least 6 chars") }}
+                            {% for error in form.password.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.confirm_password.label }}</label>
+                            {{ form.confirm_password(class="form-control rounded-pill px-3 py-2", placeholder="Repeat password") }}
+                            {% for error in form.confirm_password.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4 form-check">
+                        {{ form.agree_terms(class="form-check-input") }}
+                        <label class="form-check-label small text-muted" for="agree_terms">
+                            I agree to the <a href="{{ url_for('main.privacy') }}" target="_blank">Privacy Policy</a> & Data Privacy Act of 2012 terms.
+                        </label>
+                        {% for error in form.agree_terms.errors %}
+                            <div class="text-danger small mt-1 d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    {{ form.submit(class="btn btn-lc-pink btn-rounded w-100 py-2 mb-3") }}
+
+                    <div class="text-center text-muted small">
+                        Already have an account?
+                        <a href="{{ url_for('auth.login') }}" class="fw-bold text-primary text-decoration-none">Sign In</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

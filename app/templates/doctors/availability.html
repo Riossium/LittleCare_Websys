@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Availability Schedules - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Availability Schedules</h2>
+            <p class="text-muted mb-0">Configure your available clinic consultation dates and time blocks</p>
+        </div>
+        <a href="{{ url_for('doctors.dashboard') }}" class="btn btn-outline-secondary btn-rounded">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Add New Schedule Slot Form -->
+        <div class="col-lg-5">
+            <div class="lc-card p-4">
+                <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-calendar-plus text-primary me-2"></i> Add Availability Slot</h5>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.available_date.label }}</label>
+                        {{ form.available_date(class="form-control rounded-pill px-3 py-2") }}
+                        {% for error in form.available_date.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.start_time.label }}</label>
+                            {{ form.start_time(class="form-control rounded-pill px-3 py-2", type="time") }}
+                            {% for error in form.start_time.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.end_time.label }}</label>
+                            {{ form.end_time(class="form-control rounded-pill px-3 py-2", type="time") }}
+                            {% for error in form.end_time.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.slot_duration_minutes.label }}</label>
+                            {{ form.slot_duration_minutes(class="form-select rounded-pill px-3 py-2") }}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.max_patients.label }}</label>
+                            {{ form.max_patients(class="form-control rounded-pill px-3 py-2") }}
+                        </div>
+                    </div>
+
+                    {{ form.submit(class="btn btn-lc-primary btn-rounded w-100 py-2") }}
+                </form>
+            </div>
+        </div>
+
+        <!-- Active Schedules List -->
+        <div class="col-lg-7">
+            <div class="lc-card p-4">
+                <h5 class="fw-bold mb-3 text-dark">Active Published Schedules</h5>
+                {% if schedules %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light small text-muted">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Time Window</th>
+                                    <th>Slot Length</th>
+                                    <th>Max Capacity</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for s in schedules %}
+                                    <tr>
+                                        <td class="fw-bold text-dark">{{ s.date_formatted }}</td>
+                                        <td>{{ s.time_formatted }}</td>
+                                        <td>{{ s.slot_duration_minutes }} mins</td>
+                                        <td><span class="badge bg-light text-dark border">{{ s.max_patients }} patients</span></td>
+                                        <td class="text-end">
+                                            <form method="POST" action="{{ url_for('doctors.delete_availability', avail_id=s.id) }}" class="d-inline" onsubmit="return confirm('Remove this schedule slot?');">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5 text-muted small">
+                        <i class="bi bi-calendar-x fs-3 d-block mb-2"></i>
+                        No active schedules configured. Use the form on the left to add your clinic hours.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

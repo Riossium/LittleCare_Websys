@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Accounts - LittleCare Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">User Account Management</h2>
+            <p class="text-muted mb-0">Oversee parent, doctor, and administrator accounts</p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-rounded">
+            <i class="bi bi-arrow-left me-1"></i> Dashboard
+        </a>
+    </div>
+
+    <!-- Role Filter -->
+    <div class="d-flex gap-2 mb-4">
+        <a href="{{ url_for('admin.users', role='all') }}" class="btn btn-sm rounded-pill px-3 {% if current_role == 'all' %}btn-primary{% else %}btn-light border{% endif %}">
+            All Users
+        </a>
+        <a href="{{ url_for('admin.users', role='parent') }}" class="btn btn-sm rounded-pill px-3 {% if current_role == 'parent' %}btn-primary{% else %}btn-light border{% endif %}">
+            Parents Only
+        </a>
+        <a href="{{ url_for('admin.users', role='doctor') }}" class="btn btn-sm rounded-pill px-3 {% if current_role == 'doctor' %}btn-primary{% else %}btn-light border{% endif %}">
+            Doctors Only
+        </a>
+        <a href="{{ url_for('admin.users', role='admin') }}" class="btn btn-sm rounded-pill px-3 {% if current_role == 'admin' %}btn-primary{% else %}btn-light border{% endif %}">
+            Administrators
+        </a>
+    </div>
+
+    <div class="lc-card p-4">
+        {% if users %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small text-muted">
+                        <tr>
+                            <th>User Name</th>
+                            <th>Email Address</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Registered</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                            <tr>
+                                <td class="fw-bold text-dark">{{ u.full_name }}</td>
+                                <td>{{ u.email }}</td>
+                                <td class="small text-muted">{{ u.phone or '-' }}</td>
+                                <td>
+                                    {% if u.role == 'parent' %}
+                                        <span class="badge badge-pink">Parent ({{ u.baby_profiles.count() }} babies)</span>
+                                    {% elif u.role == 'doctor' %}
+                                        <span class="badge badge-mint">Doctor</span>
+                                    {% else %}
+                                        <span class="badge badge-blue">Admin</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if u.is_active %}
+                                        <span class="badge bg-success-subtle text-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger">Disabled</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small text-muted">{{ u.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td class="text-end">
+                                    {% if u.id != current_user.id %}
+                                        <form method="POST" action="{{ url_for('admin.toggle_user_status', user_id=u.id) }}" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-{{ 'danger' if u.is_active else 'success' }} rounded-pill px-3">
+                                                {{ 'Deactivate' if u.is_active else 'Activate' }}
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="text-muted small">Current User</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5 text-muted small">No users found for this role.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

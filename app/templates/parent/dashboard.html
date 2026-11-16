@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+
+{% block title %}Parent Dashboard - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Welcome Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                Hello, {{ current_user.first_name }}! 👋
+            </h2>
+            <p class="text-muted mb-0">Here is your baby's healthcare summary and upcoming milestones.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('ai.index') }}" class="btn btn-lc-pink btn-rounded shadow-sm">
+                <i class="bi bi-robot me-1"></i> Ask AI Assistant
+            </a>
+            <a href="{{ url_for('doctors.directory') }}" class="btn btn-lc-primary btn-rounded shadow-sm">
+                <i class="bi bi-calendar2-plus me-1"></i> Book Consultation
+            </a>
+        </div>
+    </div>
+
+    {% if not active_baby %}
+        <!-- EMPTY STATE: No Baby Profile -->
+        <div class="empty-state my-5">
+            <div class="stat-icon bg-pink-subtle text-danger mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2.5rem; background-color: var(--primary-pink-soft);">
+                <i class="bi bi-person-heart"></i>
+            </div>
+            <h3 class="fw-bold text-dark mb-2">No Baby Profile Found</h3>
+            <p class="text-muted max-w-700 mx-auto mb-4">
+                To unlock growth tracking, personalized vaccination schedules, smart recommendations, and context-aware AI healthcare advice, please add your baby's profile.
+            </p>
+            <a href="{{ url_for('baby.create') }}" class="btn btn-lc-primary btn-rounded px-4 py-2">
+                <i class="bi bi-plus-circle-fill me-2"></i> Add Baby Profile Now
+            </a>
+        </div>
+    {% else %}
+        <!-- ACTIVE BABY PROFILE SUMMARY BANNER -->
+        <div class="lc-card p-4 mb-4" style="background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);">
+            <div class="row align-items-center g-4">
+                <div class="col-md-auto text-center">
+                    <span class="rounded-circle bg-info-subtle text-primary fw-bold d-inline-flex align-items-center justify-content-center border" style="width: 84px; height: 84px; font-size: 2.2rem;">
+                        {{ active_baby.name[0] }}
+                    </span>
+                </div>
+                <div class="col-md">
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                        <h3 class="fw-bold text-dark mb-0">{{ active_baby.name }}</h3>
+                        <span class="badge badge-blue">{{ active_baby.gender|capitalize }}</span>
+                        {% if active_baby.blood_type %}
+                            <span class="badge badge-pink">Blood {{ active_baby.blood_type }}</span>
+                        {% endif %}
+                        {% if active_baby.allergies %}
+                            <span class="badge bg-danger-subtle text-danger" title="{{ active_baby.allergies }}"><i class="bi bi-exclamation-triangle-fill me-1"></i> Allergies Noted</span>
+                        {% endif %}
+                    </div>
+                    <div class="text-muted small d-flex flex-wrap gap-3">
+                        <span><i class="bi bi-calendar3 me-1 text-primary"></i> <strong>Age:</strong> {{ active_baby.age_display }}</span>
+                        <span><i class="bi bi-balloon-fill me-1 text-danger"></i> <strong>Born:</strong> {{ active_baby.date_of_birth.strftime('%B %d, %Y') }}</span>
+                        {% if active_baby.birth_weight %}
+                            <span><i class="bi bi-speedometer me-1 text-success"></i> <strong>Birth:</strong> {{ active_baby.birth_weight }} kg</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-auto text-md-end">
+                    <div class="btn-group">
+                        <a href="{{ url_for('baby.view', baby_id=active_baby.id) }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-2">
+                            <i class="bi bi-eye me-1"></i> Full Profile
+                        </a>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border rounded-pill px-3 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Switch Baby ({{ all_babies|length }})
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-4">
+                                {% for b in all_babies %}
+                                    <li>
+                                        <a class="dropdown-item py-2 {% if b.id == active_baby.id %}active{% endif %}" href="{{ url_for('baby.select', baby_id=b.id) }}">
+                                            {{ b.name }} ({{ b.age_display }})
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item py-2 text-primary" href="{{ url_for('baby.create') }}"><i class="bi bi-plus-circle me-1"></i> Add Another Baby</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAT METRICS ROW -->
+        <div class="row g-3 mb-4">
+            <!-- Latest Weight -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon bg-info-subtle text-primary">
+                        <i class="bi bi-speedometer2"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Latest Weight</small>
+                        <h4 class="fw-bold mb-0 text-dark">
+                            {% if latest_growth %}
+                                {{ latest_growth.weight_kg }} <small class="fs-6 text-muted">kg</small>
+                            {% else %}
+                                <span class="fs-6 text-muted">Not recorded</span>
+                            {% endif %}
+                        </h4>
+                        <small class="text-muted" style="font-size: 0.75rem;">
+                            {% if latest_growth %}
+                                {{ latest_growth.recorded_date.strftime('%b %d') }}
+                            {% else %}
+                                <a href="{{ url_for('health.add_growth') }}" class="text-primary text-decoration-none">+ Log weight</a>
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Latest Height -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon bg-primary-subtle text-primary">
+                        <i class="bi bi-rulers"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Latest Length</small>
+                        <h4 class="fw-bold mb-0 text-dark">
+                            {% if latest_growth %}
+                                {{ latest_growth.height_cm }} <small class="fs-6 text-muted">cm</small>
+                            {% else %}
+                                <span class="fs-6 text-muted">Not recorded</span>
+                            {% endif %}
+                        </h4>
+                        <small class="text-muted" style="font-size: 0.75rem;">
+                            {% if latest_growth and latest_growth.bmi %}
+                                BMI: {{ latest_growth.bmi }}
+                            {% else %}
+                                <a href="{{ url_for('health.growth') }}" class="text-primary text-decoration-none">WHO curve</a>
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vaccinations -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon bg-success-subtle text-success">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Immunizations</small>
+                        <h4 class="fw-bold mb-0 text-dark">
+                            {{ vaccine_summary.completed }} <small class="fs-6 text-muted">given</small>
+                        </h4>
+                        <small class="text-muted" style="font-size: 0.75rem;">
+                            {{ vaccine_summary.pending }} scheduled / pending
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointments -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon bg-warning-subtle text-warning">
+                        <i class="bi bi-calendar-event"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Consultations</small>
+                        <h4 class="fw-bold mb-0 text-dark">
+                            {{ upcoming_appointments|length }} <small class="fs-6 text-muted">upcoming</small>
+                        </h4>
+                        <small class="text-muted" style="font-size: 0.75rem;">
+                            {{ pending_requests }} pending approval
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN DASHBOARD CONTENT GRID -->
+        <div class="row g-4">
+            <!-- LEFT COLUMN: Recommendations & Appointments -->
+            <div class="col-lg-7">
+                <!-- SMART RECOMMENDATIONS WIDGET -->
+                <div class="lc-card mb-4">
+                    <div class="lc-card-header">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-lightbulb-fill text-warning fs-5"></i>
+                            <span>Smart Pediatric Recommendations</span>
+                        </div>
+                        <a href="{{ url_for('recommendations.index') }}" class="small text-primary text-decoration-none">View All</a>
+                    </div>
+                    <div class="p-3">
+                        {% if recommendations %}
+                            <div class="d-flex flex-column gap-2">
+                                {% for rec in recommendations[:3] %}
+                                    <div class="p-3 rounded-4 bg-light border d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2 mb-1">
+                                                <span class="badge badge-{{ rec.badge_class }}">{{ rec.category }}</span>
+                                                <strong class="text-dark small">{{ rec.title }}</strong>
+                                            </div>
+                                            <p class="text-muted small mb-0">{{ rec.description }}</p>
+                                        </div>
+                                        {% if rec.action_url %}
+                                            <a href="{{ rec.action_url }}" class="btn btn-sm btn-outline-primary btn-rounded flex-shrink-0">
+                                                {{ rec.action_label or 'View' }}
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-3 text-muted small">
+                                <i class="bi bi-check2-circle text-success fs-4 d-block mb-1"></i>
+                                All health milestones and reminders are currently up to date!
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- UPCOMING APPOINTMENTS -->
+                <div class="lc-card mb-4">
+                    <div class="lc-card-header">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-calendar2-check text-primary fs-5"></i>
+                            <span>Upcoming Doctor Consultations</span>
+                        </div>
+                        <a href="{{ url_for('appointments.my_appointments') }}" class="small text-primary text-decoration-none">All Bookings</a>
+                    </div>
+                    <div class="p-3">
+                        {% if upcoming_appointments %}
+                            <div class="list-group list-group-flush">
+                                {% for apt in upcoming_appointments %}
+                                    <div class="list-group-item px-0 py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="rounded-circle bg-primary-subtle text-primary p-2 fs-5">
+                                                <i class="bi bi-person-badge-fill"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-0 text-dark">{{ apt.doctor.doctor_name }}</h6>
+                                                <small class="text-muted">{{ apt.doctor.specialty }} &bull; {{ apt.consultation_type }}</small>
+                                                <div class="small text-primary fw-bold">{{ apt.formatted_datetime }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-{{ apt.status_badge_class }}-subtle text-{{ apt.status_badge_class }}">{{ apt.status }}</span>
+                                            <a href="{{ url_for('appointments.detail', appointment_id=apt.id) }}" class="btn btn-sm btn-light rounded-pill">Details</a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4 text-muted small">
+                                <i class="bi bi-calendar-x fs-3 d-block mb-1 text-secondary"></i>
+                                No upcoming appointments scheduled.
+                                <div class="mt-2">
+                                    <a href="{{ url_for('doctors.directory') }}" class="btn btn-sm btn-outline-primary btn-rounded">Find an Available Pediatrician</a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Vaccines, Growth Shortcuts & Health Guides -->
+            <div class="col-lg-5">
+                <!-- IMMUNIZATION DUE SOON ALERT -->
+                <div class="lc-card mb-4">
+                    <div class="lc-card-header">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-shield-plus text-success fs-5"></i>
+                            <span>Vaccines Due or Scheduled</span>
+                        </div>
+                        <a href="{{ url_for('health.vaccinations') }}" class="small text-success text-decoration-none">Vaccine Hub</a>
+                    </div>
+                    <div class="p-3">
+                        {% if vaccine_summary.due_soon %}
+                            <div class="d-flex flex-column gap-2">
+                                {% for v in vaccine_summary.due_soon %}
+                                    <div class="p-2 px-3 rounded-3 bg-warning-subtle border border-warning d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong class="text-dark small d-block">{{ v.vaccine_name }}</strong>
+                                            <small class="text-danger fw-bold">Due: {{ v.next_scheduled_date.strftime('%b %d, %Y') if v.next_scheduled_date else 'Soon' }}</small>
+                                        </div>
+                                        <a href="{{ url_for('health.edit_vaccination', record_id=v.id) }}" class="btn btn-sm btn-warning btn-rounded">Mark Given</a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-3 text-muted small">
+                                <i class="bi bi-shield-check text-success fs-4 d-block mb-1"></i>
+                                No vaccines currently overdue or due in the next 14 days.
+                            </div>
+                        {% endif %}
+                        <div class="mt-3 pt-2 border-top text-center">
+                            <a href="{{ url_for('health.add_vaccination') }}" class="btn btn-sm btn-outline-success btn-rounded w-100">
+                                <i class="bi bi-plus-circle me-1"></i> Log Vaccine Dose
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK ACTIONS CARD -->
+                <div class="lc-card p-3 mb-4">
+                    <h6 class="fw-bold text-dark px-2 mb-3">Quick Actions</h6>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('health.add_growth') }}" class="btn btn-light text-start rounded-pill py-2 px-3 border d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-graph-up text-primary me-2"></i> Log Growth Measurements</span>
+                            <i class="bi bi-chevron-right text-muted small"></i>
+                        </a>
+                        <a href="{{ url_for('health.add_checkup') }}" class="btn btn-light text-start rounded-pill py-2 px-3 border d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-clipboard2-pulse text-danger me-2"></i> Record Pediatric Checkup</span>
+                            <i class="bi bi-chevron-right text-muted small"></i>
+                        </a>
+                        <a href="{{ url_for('ai.index') }}" class="btn btn-light text-start rounded-pill py-2 px-3 border d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-chat-heart text-info me-2"></i> Ask Baby Care Questions</span>
+                            <i class="bi bi-chevron-right text-muted small"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- RECOMMENDED ARTICLES -->
+                {% if articles %}
+                <div class="lc-card">
+                    <div class="lc-card-header">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-journal-medical text-primary fs-5"></i>
+                            <span>Pediatric Health Guides</span>
+                        </div>
+                        <a href="{{ url_for('articles.index') }}" class="small text-primary text-decoration-none">Browse All</a>
+                    </div>
+                    <div class="p-3">
+                        <div class="list-group list-group-flush">
+                            {% for art in articles %}
+                                <a href="{{ url_for('articles.detail', slug=art.slug) }}" class="list-group-item list-group-item-action px-2 py-2 border-0 rounded-3 mb-1">
+                                    <span class="badge badge-blue small mb-1">{{ art.category }}</span>
+                                    <div class="fw-bold text-dark small">{{ art.title }}</div>
+                                    <small class="text-muted d-block">{{ art.short_description[:80] }}...</small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

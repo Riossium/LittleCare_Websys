@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}{{ baby.name }} - Health Profile | LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header Banner -->
+    <div class="lc-card p-4 mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <span class="rounded-circle bg-info-subtle text-primary fw-bold d-inline-flex align-items-center justify-content-center border" style="width: 72px; height: 72px; font-size: 1.8rem;">
+                    {{ baby.name[0] }}
+                </span>
+                <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <h3 class="fw-bold text-dark mb-0">{{ baby.name }}</h3>
+                        <span class="badge badge-blue">{{ baby.gender|capitalize }}</span>
+                        {% if baby.blood_type %}<span class="badge badge-pink">Blood {{ baby.blood_type }}</span>{% endif %}
+                    </div>
+                    <div class="text-muted small mt-1">
+                        <span><strong>Age:</strong> {{ baby.age_display }}</span> &bull;
+                        <span><strong>Date of Birth:</strong> {{ baby.date_of_birth.strftime('%B %d, %Y') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('baby.edit', baby_id=baby.id) }}" class="btn btn-outline-secondary btn-rounded">
+                    <i class="bi bi-pencil me-1"></i> Edit Profile
+                </a>
+                <a href="{{ url_for('appointments.book', doctor_id=1) }}" class="btn btn-lc-primary btn-rounded">
+                    <i class="bi bi-calendar2-plus me-1"></i> Book Consultation
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Grid -->
+    <div class="row g-4 mb-4">
+        <!-- Birth & Clinical Notes -->
+        <div class="col-md-6 col-lg-4">
+            <div class="lc-card p-4 h-100">
+                <h5 class="fw-bold mb-3"><i class="bi bi-card-checklist text-primary me-2"></i> Birth Information</h5>
+                <ul class="list-unstyled text-muted small d-flex flex-column gap-2 mb-0">
+                    <li><strong>Birth Weight:</strong> {{ baby.birth_weight or 'Not recorded' }} kg</li>
+                    <li><strong>Birth Length:</strong> {{ baby.birth_height or 'Not recorded' }} cm</li>
+                    <li><strong>Head Circumference:</strong> {{ baby.birth_head_circumference or 'Not recorded' }} cm</li>
+                    <li><strong>Known Allergies:</strong> {{ baby.allergies or 'None reported' }}</li>
+                    <li><strong>Pediatrician / Birth Notes:</strong> {{ baby.pediatrician_notes or 'None' }}</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Latest Growth -->
+        <div class="col-md-6 col-lg-4">
+            <div class="lc-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-graph-up text-info me-2"></i> Recent Growth</h5>
+                    <a href="{{ url_for('health.growth') }}" class="small text-primary text-decoration-none">Charts</a>
+                </div>
+                {% if recent_growth %}
+                    <ul class="list-unstyled d-flex flex-column gap-2 mb-3 small">
+                        {% for g in recent_growth %}
+                            <li class="p-2 rounded-3 bg-light d-flex justify-content-between align-items-center">
+                                <span>{{ g.recorded_date.strftime('%b %d, %Y') }}</span>
+                                <span class="fw-bold text-dark">{{ g.weight_kg }} kg &bull; {{ g.height_cm }} cm</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted small">No growth records logged yet.</p>
+                {% endif %}
+                <a href="{{ url_for('health.add_growth') }}" class="btn btn-sm btn-outline-info rounded-pill w-100 mt-auto">
+                    + Log Growth Entry
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Vaccines -->
+        <div class="col-md-6 col-lg-4">
+            <div class="lc-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-shield-check text-success me-2"></i> Immunizations</h5>
+                    <a href="{{ url_for('health.vaccinations') }}" class="small text-success text-decoration-none">All</a>
+                </div>
+                {% if recent_vaccines %}
+                    <ul class="list-unstyled d-flex flex-column gap-2 mb-3 small">
+                        {% for v in recent_vaccines %}
+                            <li class="p-2 rounded-3 bg-light d-flex justify-content-between align-items-center">
+                                <span class="text-truncate me-2">{{ v.vaccine_name }}</span>
+                                <span class="badge bg-{{ 'success' if v.status == 'completed' else 'warning' }}-subtle text-{{ 'success' if v.status == 'completed' else 'warning' }}">{{ v.status }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted small">No vaccines recorded yet.</p>
+                {% endif %}
+                <a href="{{ url_for('health.add_vaccination') }}" class="btn btn-sm btn-outline-success rounded-pill w-100 mt-auto">
+                    + Record Vaccine
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Healthcare Services - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center max-w-700 mx-auto mb-5">
+        <span class="badge badge-blue px-3 py-2 rounded-pill mb-2">Our Capabilities</span>
+        <h1 class="fw-bold text-dark">Comprehensive Baby Healthcare Services</h1>
+        <p class="text-muted">Explore how LittleCare provides an all-in-one healthcare management experience for families and doctors.</p>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <!-- Service 1 -->
+        <div class="col-md-6">
+            <div class="lc-card p-4 p-md-5 h-100">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="rounded-circle bg-info-subtle p-3 text-primary fs-3">
+                        <i class="bi bi-file-earmark-medical"></i>
+                    </span>
+                    <h4 class="fw-bold mb-0">Centralized Baby Health Records</h4>
+                </div>
+                <p class="text-muted leading-relaxed">
+                    Store and organize all health events, well-baby checkup notes, prescriptions, laboratory attachments, and milestone observations in one secure, accessible place. Filter easily by category and access historical records whenever visiting a new healthcare provider.
+                </p>
+                <ul class="text-muted small">
+                    <li>Multi-baby profile support under a single parent account</li>
+                    <li>Secure document upload (prescriptions, lab tests, certificates)</li>
+                    <li>Automatic age calculation in months and days</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Service 2 -->
+        <div class="col-md-6">
+            <div class="lc-card p-4 p-md-5 h-100">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="rounded-circle bg-primary-subtle p-3 text-primary fs-3">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </span>
+                    <h4 class="fw-bold mb-0">Pediatric Growth Monitoring</h4>
+                </div>
+                <p class="text-muted leading-relaxed">
+                    Track your baby's physical development with interactive Chart.js growth charts. Compare recorded weight, length/height, and head circumference against official World Health Organization (WHO) Child Growth Standards.
+                </p>
+                <ul class="text-muted small">
+                    <li>Dynamic visual percentile comparisons (Median, P15, P85)</li>
+                    <li>Calculated Body Mass Index (BMI) tracking</li>
+                    <li>Monthly growth update reminders</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Service 3 -->
+        <div class="col-md-6">
+            <div class="lc-card p-4 p-md-5 h-100">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="rounded-circle bg-success-subtle p-3 text-success fs-3">
+                        <i class="bi bi-shield-check"></i>
+                    </span>
+                    <h4 class="fw-bold mb-0">Immunization Schedule Management</h4>
+                </div>
+                <p class="text-muted leading-relaxed">
+                    Never lose track of a vaccine dose again. LittleCare tracks childhood vaccines from birth through toddlerhood (BCG, Hepatitis B, Pentavalent, Polio, PCV, Rotavirus, MMR) and triggers automatic notifications when upcoming doses are due.
+                </p>
+                <ul class="text-muted small">
+                    <li>Complete vaccine logs with batch numbers and administering clinic</li>
+                    <li>Scheduled, completed, and missed status tracking</li>
+                    <li>Automated 7-day advance reminders</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Service 4 -->
+        <div class="col-md-6">
+            <div class="lc-card p-4 p-md-5 h-100">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="rounded-circle bg-danger-subtle p-3 text-danger fs-3">
+                        <i class="bi bi-robot"></i>
+                    </span>
+                    <h4 class="fw-bold mb-0">AI Healthcare Assistant</h4>
+                </div>
+                <p class="text-muted leading-relaxed">
+                    Powered by OpenAI and pediatric knowledge engines, our AI assistant answers everyday parenting and baby healthcare inquiries. With parental authorization, it retrieves your baby's age and health records to provide personalized educational guidance.
+                </p>
+                <ul class="text-muted small">
+                    <li>Safe pediatric guardrails (no diagnosis, no prescription)</li>
+                    <li>Red-flag emergency symptom detection and urgent advisory</li>
+                    <li>Interactive suggested next steps & relevant library articles</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

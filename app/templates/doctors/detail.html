@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}{{ doctor.doctor_name }} - Pediatrician Profile | LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Doctor Profile Header -->
+    <div class="lc-card p-4 p-md-5 mb-4">
+        <div class="row align-items-center g-4">
+            <div class="col-md-auto text-center">
+                <span class="rounded-circle bg-info-subtle text-primary fw-bold d-inline-flex align-items-center justify-content-center border" style="width: 96px; height: 96px; font-size: 2.5rem;">
+                    {{ doctor.user.first_name[0] }}
+                </span>
+            </div>
+            <div class="col-md">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                    <h3 class="fw-bold text-dark mb-0">{{ doctor.full_title }}</h3>
+                    <span class="badge badge-mint">{{ doctor.specialty }}</span>
+                    <span class="badge bg-success text-white"><i class="bi bi-patch-check-fill me-1"></i> PRC Verified Physician</span>
+                </div>
+                <div class="text-muted small d-flex flex-wrap gap-3 mt-2">
+                    <span><i class="bi bi-hospital me-1 text-primary"></i> {{ doctor.clinic_affiliation }}</span>
+                    <span><i class="bi bi-award me-1 text-warning"></i> {{ doctor.experience_years }} Years Clinical Experience</span>
+                    <span><i class="bi bi-card-text me-1 text-info"></i> PRC License #{{ doctor.license_number }}</span>
+                </div>
+            </div>
+            <div class="col-md-auto">
+                {% if current_user.is_authenticated and current_user.is_parent %}
+                    <a href="{{ url_for('appointments.book', doctor_id=doctor.id) }}" class="btn btn-lc-primary btn-rounded btn-lg px-4 shadow">
+                        <i class="bi bi-calendar2-plus me-1"></i> Request Consultation
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.login', next=url_for('appointments.book', doctor_id=doctor.id)) }}" class="btn btn-lc-primary btn-rounded btn-lg px-4 shadow">
+                        Sign In to Book
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctor Details and Schedules Grid -->
+    <div class="row g-4">
+        <!-- Biography & Qualifications -->
+        <div class="col-lg-7">
+            <div class="lc-card p-4 mb-4">
+                <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-file-person text-primary me-2"></i> Physician Biography</h5>
+                <p class="text-muted leading-relaxed">
+                    {{ doctor.bio or 'Dr. ' ~ doctor.user.last_name ~ ' is a dedicated pediatrician committed to comprehensive well-child evaluations, growth milestone guidance, and preventative infant healthcare.' }}
+                </p>
+
+                <hr class="my-3">
+
+                <h6 class="fw-bold text-dark mb-2">Practice Details</h6>
+                <div class="row g-3 small text-muted">
+                    <div class="col-sm-6">
+                        <strong>Primary Clinic:</strong><br>
+                        {{ doctor.clinic_affiliation }}<br>
+                        {{ doctor.clinic_address or 'Metro Manila' }}
+                    </div>
+                    <div class="col-sm-6">
+                        <strong>Consultation Modes:</strong><br>
+                        {{ doctor.consultation_types }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Published Availability Slots -->
+        <div class="col-lg-5">
+            <div class="lc-card p-4">
+                <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-clock-history text-success me-2"></i> Published Schedules</h5>
+                {% if availabilities %}
+                    <div class="d-flex flex-column gap-2 mb-3">
+                        {% for a in availabilities %}
+                            <div class="p-3 rounded-4 bg-light border d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="d-block text-dark small">{{ a.date_formatted }}</strong>
+                                    <small class="text-muted"><i class="bi bi-clock me-1"></i> {{ a.time_formatted }}</small>
+                                </div>
+                                <span class="badge bg-success-subtle text-success">Slots Available</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4 text-muted small">
+                        Doctor has not published specific upcoming clinic blocks yet. You can still submit a consultation request date.
+                    </div>
+                {% endif %}
+
+                {% if current_user.is_authenticated and current_user.is_parent %}
+                    <a href="{{ url_for('appointments.book', doctor_id=doctor.id) }}" class="btn btn-outline-primary btn-rounded w-100 mt-2">
+                        Proceed to Booking Form
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

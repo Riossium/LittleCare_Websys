@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if is_edit else 'Add' }} Medical Checkup - {{ baby.name }} | LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9 col-lg-8">
+            <div class="lc-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <span class="rounded-circle bg-danger-subtle p-3 text-danger d-inline-flex mb-2">
+                        <i class="bi bi-clipboard2-pulse fs-2"></i>
+                    </span>
+                    <h3 class="fw-bold text-dark">{{ 'Edit' if is_edit else 'Record' }} Medical Visit</h3>
+                    <p class="text-muted small">Log clinical visit details for <strong>{{ baby.name }}</strong></p>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.checkup_date.label }}</label>
+                            {{ form.checkup_date(class="form-control rounded-pill px-3 py-2") }}
+                            {% for error in form.checkup_date.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.visit_type.label }}</label>
+                            {{ form.visit_type(class="form-select rounded-pill px-3 py-2") }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.provider_name.label }}</label>
+                        {{ form.provider_name(class="form-control rounded-pill px-3 py-2", placeholder="e.g. Dr. Maria Santos, MD / Medical City Clinic") }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.diagnosis.label }}</label>
+                        {{ form.diagnosis(class="form-control rounded-4 px-3 py-2", rows="2", placeholder="Physician's assessment, physical exam findings, milestone checks...") }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.treatment_summary.label }}</label>
+                        {{ form.treatment_summary(class="form-control rounded-4 px-3 py-2", rows="2", placeholder="Recommended care instructions, dietary adjustments, medication regimen...") }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.clinical_notes.label }}</label>
+                        {{ form.clinical_notes(class="form-control rounded-4 px-3 py-2", rows="2", placeholder="Observations, questions discussed during visit, next checkup date...") }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small">{{ form.document.label }}</label>
+                        {{ form.document(class="form-control rounded-pill px-3 py-2") }}
+                        <small class="text-muted" style="font-size: 0.75rem;">Supported formats: PDF, JPG, PNG (Max 16MB)</small>
+                    </div>
+
+                    {{ form.submit(class="btn btn-lc-pink btn-rounded w-100 py-2 mb-2") }}
+                    <a href="{{ url_for('health.checkups') }}" class="btn btn-light rounded-pill w-100 text-muted">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

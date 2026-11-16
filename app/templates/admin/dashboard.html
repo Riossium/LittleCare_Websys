@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Administrator Control Center - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Administrative Control Center 🛡️</h2>
+            <p class="text-muted mb-0">System health statistics, doctor credential verifications, and platform governance</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin.create_article') }}" class="btn btn-lc-mint btn-rounded">
+                <i class="bi bi-plus-circle me-1"></i> New Article
+            </a>
+            <a href="{{ url_for('admin.doctors', status='pending') }}" class="btn btn-warning btn-rounded text-dark fw-bold">
+                <i class="bi bi-patch-check-fill me-1"></i> Review Doctors ({{ pending_doctors }})
+            </a>
+        </div>
+    </div>
+
+    <!-- System Stats Cards Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-2">
+            <div class="stat-card p-3">
+                <div class="stat-icon bg-info-subtle text-primary" style="width: 46px; height: 46px; font-size: 1.3rem;"><i class="bi bi-people-fill"></i></div>
+                <div>
+                    <small class="text-muted d-block" style="font-size: 0.75rem;">Parents</small>
+                    <h4 class="fw-bold mb-0 text-dark">{{ total_parents }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-2">
+            <div class="stat-card p-3">
+                <div class="stat-icon bg-success-subtle text-success" style="width: 46px; height: 46px; font-size: 1.3rem;"><i class="bi bi-hospital"></i></div>
+                <div>
+                    <small class="text-muted d-block" style="font-size: 0.75rem;">Doctors</small>
+                    <h4 class="fw-bold mb-0 text-dark">{{ total_doctors }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-2">
+            <div class="stat-card p-3">
+                <div class="stat-icon bg-warning-subtle text-warning" style="width: 46px; height: 46px; font-size: 1.3rem;"><i class="bi bi-patch-exclamation-fill"></i></div>
+                <div>
+                    <small class="text-muted d-block" style="font-size: 0.75rem;">Pending Verif.</small>
+                    <h4 class="fw-bold mb-0 text-dark">{{ pending_doctors }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-2">
+            <div class="stat-card p-3">
+                <div class="stat-icon bg-pink-subtle text-danger" style="width: 46px; height: 46px; font-size: 1.3rem; background-color: var(--primary-pink-soft);"><i class="bi bi-balloon-heart-fill"></i></div>
+                <div>
+                    <small class="text-muted d-block" style="font-size: 0.75rem;">Babies</small>
+                    <h4 class="fw-bold mb-0 text-dark">{{ total_babies }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-2">
+            <div class="stat-card p-3">
+                <div class="stat-icon bg-primary-subtle text-primary" style="width: 46px; height: 46px; font-size: 1.3rem;"><i class="bi bi-calendar-event"></i></div>
+                <div>
+                    <small class="text-muted d-block" style="font-size: 0.75rem;">Appointments</small>
+                    <h4 class="fw-bold mb-0 text-dark">{{ total_appointments }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-2">
+            <div class="stat-card p-3">
+                <div class="stat-icon bg-secondary-subtle text-secondary" style="width: 46px; height: 46px; font-size: 1.3rem;"><i class="bi bi-journal-text"></i></div>
+                <div>
+                    <small class="text-muted d-block" style="font-size: 0.75rem;">Articles</small>
+                    <h4 class="fw-bold mb-0 text-dark">{{ total_articles }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Grids -->
+    <div class="row g-4 mb-4">
+        <!-- PENDING DOCTOR VERIFICATIONS -->
+        <div class="col-lg-6">
+            <div class="lc-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-patch-question-fill text-warning me-2"></i> Pending Doctor Approvals</h5>
+                    <a href="{{ url_for('admin.doctors', status='pending') }}" class="small text-primary text-decoration-none">Manage All</a>
+                </div>
+
+                {% if pending_doctor_list %}
+                    <div class="list-group list-group-flush">
+                        {% for doc in pending_doctor_list %}
+                            <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="text-dark d-block">{{ doc.doctor_name }}</strong>
+                                    <small class="text-muted">{{ doc.specialty }} &bull; PRC: <code>{{ doc.license_number }}</code></small>
+                                    <div class="text-muted" style="font-size: 0.75rem;">{{ doc.clinic_affiliation }}</div>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <form method="POST" action="{{ url_for('admin.verify_doctor', doctor_id=doc.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
+                                            Approve
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5 text-muted small">
+                        <i class="bi bi-check2-all text-success fs-3 d-block mb-2"></i>
+                        All registered doctors have been verified!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- RECENT APPOINTMENTS MONITOR -->
+        <div class="col-lg-6">
+            <div class="lc-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-calendar2-week text-primary me-2"></i> Recent Platform Consultations</h5>
+                    <a href="{{ url_for('admin.appointments') }}" class="small text-primary text-decoration-none">View All</a>
+                </div>
+
+                {% if recent_appointments %}
+                    <div class="list-group list-group-flush small">
+                        {% for apt in recent_appointments %}
+                            <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="text-dark">{{ apt.baby.name }}</strong> with {{ apt.doctor.doctor_name }}
+                                    <div class="text-muted" style="font-size: 0.75rem;">{{ apt.formatted_datetime }} &bull; Parent: {{ apt.parent.full_name }}</div>
+                                </div>
+                                <span class="badge bg-{{ apt.status_badge_class }}-subtle text-{{ apt.status_badge_class }}">{{ apt.status }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5 text-muted small">No appointments booked yet.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIT LOGS OVERVIEW -->
+    <div class="lc-card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-shield-lock text-secondary me-2"></i> Security & Record Access Audit Trail (DPA 2012)</h5>
+            <a href="{{ url_for('admin.audit_logs') }}" class="small text-primary text-decoration-none">Full Audit Log</a>
+        </div>
+        {% if recent_logs %}
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0 font-monospace" style="font-size: 0.8rem;">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                            <th>IP Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for l in recent_logs %}
+                            <tr>
+                                <td class="text-muted">{{ l.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ l.action }}</span></td>
+                                <td class="text-truncate" style="max-width: 380px;">{{ l.details or '-' }}</td>
+                                <td class="text-muted">{{ l.ip_address or 'Local' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-muted small py-3">No audit logs recorded yet.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - LittleCare Healthcare{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="lc-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <span class="rounded-circle bg-info-subtle p-3 text-primary d-inline-flex mb-2">
+                        <i class="bi bi-person-circle fs-2"></i>
+                    </span>
+                    <h3 class="fw-bold text-dark">Welcome Back</h3>
+                    <p class="text-muted small">Sign in to manage your baby's healthcare profile</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.email.label }}</label>
+                        {{ form.email(class="form-control rounded-pill px-3 py-2", placeholder="name@example.com") }}
+                        {% for error in form.email.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label fw-bold small mb-0">{{ form.password.label }}</label>
+                            <a href="{{ url_for('auth.forgot_password') }}" class="small text-decoration-none">Forgot password?</a>
+                        </div>
+                        {{ form.password(class="form-control rounded-pill px-3 py-2", placeholder="Enter your password") }}
+                        {% for error in form.password.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-4 form-check">
+                        {{ form.remember_me(class="form-check-input") }}
+                        <label class="form-check-label small text-muted" for="remember_me">
+                            {{ form.remember_me.label.text }}
+                        </label>
+                    </div>
+
+                    {{ form.submit(class="btn btn-lc-primary btn-rounded w-100 py-2 mb-3") }}
+
+                    <div class="text-center text-muted small">
+                        Don't have an account yet? <br>
+                        <a href="{{ url_for('auth.register') }}" class="fw-bold text-primary text-decoration-none">Register as Parent</a> &bull;
+                        <a href="{{ url_for('auth.register_doctor') }}" class="fw-bold text-info text-decoration-none">Join as Doctor</a>
+                    </div>
+                </form>
+
+                <!-- Demo Credentials Helper Accordion -->
+                <div class="mt-4 pt-3 border-top">
+                    <button class="btn btn-sm btn-light w-100 rounded-pill text-muted small" type="button" data-bs-toggle="collapse" data-bs-target="#demoAccounts">
+                        <i class="bi bi-key-fill text-warning me-1"></i> View Quick Demo Accounts
+                    </button>
+                    <div class="collapse mt-2" id="demoAccounts">
+                        <div class="p-3 bg-light rounded-4 small">
+                            <div class="mb-2">
+                                <strong>Admin:</strong> <code>admin@littlecare.health</code> / <code>Admin123!</code>
+                            </div>
+                            <div class="mb-2">
+                                <strong>Parent:</strong> <code>parent@littlecare.health</code> / <code>Parent123!</code>
+                            </div>
+                            <div>
+                                <strong>Doctor:</strong> <code>doctor.santos@littlecare.health</code> / <code>Doctor123!</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

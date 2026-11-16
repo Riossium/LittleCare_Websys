@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ baby.name }}'s Profile - LittleCare{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9 col-lg-7">
+            <div class="lc-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <span class="rounded-circle bg-info-subtle p-3 text-primary d-inline-flex mb-2">
+                        <i class="bi bi-pencil-square fs-2"></i>
+                    </span>
+                    <h3 class="fw-bold text-dark">Edit Baby Profile</h3>
+                    <p class="text-muted small">Update medical and personal records for <strong>{{ baby.name }}</strong></p>
+                </div>
+
+                <form method="POST" action="{{ url_for('baby.edit', baby_id=baby.id) }}" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.name.label }}</label>
+                        {{ form.name(class="form-control rounded-pill px-3 py-2") }}
+                        {% for error in form.name.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.date_of_birth.label }}</label>
+                            {{ form.date_of_birth(class="form-control rounded-pill px-3 py-2") }}
+                            {% for error in form.date_of_birth.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold small">{{ form.gender.label }}</label>
+                            {{ form.gender(class="form-select rounded-pill px-3 py-2") }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.blood_type.label }}</label>
+                        {{ form.blood_type(class="form-select rounded-pill px-3 py-2") }}
+                    </div>
+
+                    <div class="p-3 rounded-4 bg-light mb-3 border">
+                        <h6 class="fw-bold text-dark small mb-2">Birth Measurements (Optional)</h6>
+                        <div class="row g-3">
+                            <div class="col-sm-4">
+                                <label class="form-label small fw-bold">{{ form.birth_weight.label }}</label>
+                                {{ form.birth_weight(class="form-control rounded-pill px-3 py-2") }}
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label small fw-bold">{{ form.birth_height.label }}</label>
+                                {{ form.birth_height(class="form-control rounded-pill px-3 py-2") }}
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label small fw-bold">{{ form.birth_head_circumference.label }}</label>
+                                {{ form.birth_head_circumference(class="form-control rounded-pill px-3 py-2") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.allergies.label }}</label>
+                        {{ form.allergies(class="form-control rounded-4 px-3 py-2", rows="2") }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">{{ form.pediatrician_notes.label }}</label>
+                        {{ form.pediatrician_notes(class="form-control rounded-4 px-3 py-2", rows="2") }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small">{{ form.profile_photo.label }}</label>
+                        {{ form.profile_photo(class="form-control rounded-pill px-3 py-2") }}
+                    </div>
+
+                    {{ form.submit(class="btn btn-lc-primary btn-rounded w-100 py-2 mb-3") }}
+                    <a href="{{ url_for('baby.view', baby_id=baby.id) }}" class="btn btn-light rounded-pill w-100 text-muted">Cancel</a>
+                </form>
+
+                <!-- Soft Delete / Archive Option -->
+                <div class="border-top mt-4 pt-3 text-center">
+                    <form method="POST" action="{{ url_for('baby.delete', baby_id=baby.id) }}" onsubmit="return confirm('Are you sure you want to archive this baby profile?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger border-0">
+                            <i class="bi bi-archive me-1"></i> Archive Baby Profile
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
